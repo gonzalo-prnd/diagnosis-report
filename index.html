@@ -1,0 +1,1500 @@
+<title>유리·틴팅 진단 소요시간 추적</title>
+<style>
+:root {
+  color-scheme: light;
+  --plane: #f9f9f7; --card: #fcfcfb;
+  --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --grid: #e4e5e0; --axis: #c8c9c2; --border: rgba(11,11,11,0.10);
+  --rei: #e34948; --hanta: #2a78d6;
+  --good: #0ca30c; --crit: #d03b3b; --sel: rgba(42,120,214,0.12);
+  /* 조치 구분색 — 새로 시공·교체 / 제거·광택 / 고지. 대비·색약 검증을 통과한 조합이다. */
+  --act-main: #c47f1a; --act-main-soft: rgba(196,127,26,0.15);
+  --act-alt: #7c4dbe; --act-alt-soft: rgba(124,77,190,0.13);
+  --act-notify: #6b6b66; --act-notify-soft: rgba(107,107,102,0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --plane: #0d0d0d; --card: #1a1a19;
+    --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2f2f2c; --axis: #3d3d39; --border: rgba(255,255,255,0.10);
+    --rei: #e66767; --hanta: #3987e5;
+    --sel: rgba(57,135,229,0.20);
+    --act-main: #e0a03f; --act-main-soft: rgba(224,160,63,0.18);
+    --act-alt: #a67ce0; --act-alt-soft: rgba(166,124,224,0.18);
+    --act-notify: #74746d; --act-notify-soft: rgba(116,116,109,0.26);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --plane: #0d0d0d; --card: #1a1a19;
+  --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+  --grid: #2f2f2c; --axis: #3d3d39; --border: rgba(255,255,255,0.10);
+  --rei: #e66767; --hanta: #3987e5;
+  --sel: rgba(57,135,229,0.20);
+  --act-main: #e0a03f; --act-main-soft: rgba(224,160,63,0.18);
+  --act-alt: #a67ce0; --act-alt-soft: rgba(166,124,224,0.18);
+  --act-notify: #74746d; --act-notify-soft: rgba(116,116,109,0.26);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--plane); color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
+  font-size: 15px; line-height: 1.6;
+  word-break: keep-all; overflow-wrap: break-word;
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 40px 20px 72px; display: flex; flex-direction: column; gap: 36px; }
+
+header { display: flex; flex-direction: column; gap: 10px; }
+h1 { margin: 0; font-size: 30px; font-weight: 650; letter-spacing: -0.02em; text-wrap: balance; }
+.lede { margin: 0; color: var(--ink-2); }
+.dates { display: flex; flex-wrap: wrap; gap: 6px 24px; font-size: 13.5px; color: var(--ink-2); }
+.dates .k { color: var(--muted); margin-right: 6px; }
+.dates .as-of { font-weight: 680; color: var(--ink); }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.stat-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px 18px; display: flex; flex-direction: column; gap: 2px;
+}
+.stat-head { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+.stat-head .dot { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.stat-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 3px 0; }
+.stat-label { font-size: 13.5px; color: var(--ink-2); }
+.stat-value { font-size: 21px; font-weight: 640; letter-spacing: -0.01em; }
+.count-row { border-top: 1px solid var(--grid); margin-top: 7px; padding-top: 9px; }
+.count-row .stat-value { font-size: 14.5px; font-weight: 600; }
+
+section { display: flex; flex-direction: column; gap: 16px; }
+.sec-head { border-top: 2px solid var(--ink); padding-top: 12px; }
+.sec-head h2 { margin: 0; font-size: 21px; font-weight: 640; }
+.sec-sub { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px 12px; }
+.card-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.card-head h3 { margin: 0; font-size: 15px; font-weight: 620; }
+.note { margin: 6px 0 0; font-size: 12.5px; color: var(--muted); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--ink-2); }
+.legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+.chart-wrap { position: relative; }
+.chart { width: 100%; height: auto; display: block; overflow: visible; }
+.grid { stroke: var(--grid); stroke-width: 1; }
+.tick { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.cap-label { fill: var(--ink-2); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.band { fill: var(--sel); opacity: 0; }
+.band.on { opacity: 1; }
+.tooltip {
+  position: absolute; top: 0; right: 0; pointer-events: none;
+  background: var(--card); color: var(--ink);
+  border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; font-size: 12.5px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.14); white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.tooltip .row { display: flex; align-items: center; gap: 6px; }
+.tooltip .key { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+
+.table-view { margin-top: 6px; }
+/* 접기·펼치기 표시를 모든 블록에 같은 모양으로 붙인다(브라우저 기본 마커는 감춘다) */
+summary {
+  cursor: pointer; font-size: 13px; color: var(--ink-2); padding: 4px 0;
+  display: flex; align-items: baseline; gap: 7px; list-style: none;
+}
+summary::-webkit-details-marker { display: none; }
+summary::before {
+  content: "▶"; flex: none; font-size: 9px; color: var(--muted); line-height: 1.7;
+}
+details[open] > summary::before { content: "▼"; }
+summary:hover { color: var(--ink); }
+summary:hover::before { color: var(--ink-2); }
+summary:focus-visible { outline: 2px solid var(--hanta); outline-offset: 2px; border-radius: 3px; }
+
+.table-scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--grid); vertical-align: middle; }
+thead th { font-size: 12px; font-weight: 600; color: var(--muted); border-bottom: 1px solid var(--axis); white-space: nowrap; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.mono { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sub { display: block; font-size: 12px; color: var(--muted); }
+
+.work-card { padding: 16px 20px 12px; }
+.work-head h3 { margin: 0 0 8px; font-size: 15px; font-weight: 620; }
+.work-body { padding-top: 6px; }
+
+.donut-wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; }
+.donut { width: 116px; height: 116px; flex: none; }
+.donut-total { fill: var(--ink); font-size: 25px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.donut-cap { fill: var(--muted); font-size: 11px; }
+.donut-legend { display: flex; flex-direction: column; gap: 3px; }
+.donut-row { display: flex; align-items: center; gap: 8px; font-size: 13.5px; }
+.donut-label { color: var(--ink-2); min-width: 76px; }
+.donut-num { font-weight: 640; font-variant-numeric: tabular-nums; min-width: 42px; text-align: right; }
+.donut-pct { color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+
+.calendar { margin-bottom: 14px; }
+.cal-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 10px; }
+.cal-hint { font-size: 12.5px; color: var(--muted); }
+.cal-all {
+  font: inherit; font-size: 13px; padding: 5px 12px; cursor: pointer;
+  background: var(--card); color: var(--ink-2);
+  border: 1px solid var(--axis); border-radius: 999px;
+}
+.cal-all.is-on { background: var(--ink); color: var(--card); border-color: var(--ink); }
+.cal-month { display: inline-block; margin: 0 20px 8px 0; vertical-align: top; }
+.cal-title { font-size: 13px; font-weight: 620; color: var(--ink-2); margin-bottom: 6px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 34px); gap: 3px; }
+.calendar.wide .cal-grid { grid-template-columns: repeat(7, 46px); }
+.cal-wd { font-size: 11px; color: var(--muted); text-align: center; padding-bottom: 2px; }
+.cal-pad { height: 34px; }
+.cal-day {
+  height: 34px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font: inherit; font-size: 12px; font-variant-numeric: tabular-nums; line-height: 1.1;
+  border: 1px solid transparent; border-radius: 7px; background: transparent; color: var(--muted);
+}
+button.cal-day { cursor: pointer; color: var(--ink); border-color: var(--axis); }
+button.cal-day:hover { border-color: var(--ink-2); }
+button.cal-day:focus-visible { outline: 2px solid var(--hanta); outline-offset: 1px; }
+button.cal-day.is-on { background: var(--ink); color: var(--card); border-color: var(--ink); }
+.cal-count { font-size: 10px; font-weight: 640; color: var(--ink-2); }
+button.cal-day.is-on .cal-count { color: var(--card); }
+.cal-count.zero { color: var(--muted); font-weight: 400; }
+
+.cost-card { padding-bottom: 16px; }
+.cost-today {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px;
+  padding: 10px 0 14px; border-bottom: 1px solid var(--grid);
+}
+.cost-value { font-size: 27px; font-weight: 650; letter-spacing: -0.02em; }
+.cost-sub { font-size: 13px; color: var(--muted); }
+.cost-more { margin-top: 2px; }
+.cost-more > summary { padding: 10px 0 2px; }
+.cost-more-body { padding-top: 4px; }
+.cost-months { padding: 4px 0; }
+.cost-months h4 { margin: 0 0 2px; font-size: 12px; font-weight: 620; color: var(--muted); }
+.month-value { font-size: 16px; font-weight: 620; }
+.month-count { font-size: 12.5px; font-weight: 400; color: var(--muted); margin-left: 6px; }
+.sel-amount {
+  margin: 4px 0 10px; padding: 8px 12px; border-radius: 8px;
+  background: var(--sel); font-size: 13.5px; font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.cost-table td.won { font-variant-numeric: tabular-nums; font-weight: 620; white-space: nowrap; }
+.cost-table .pale { color: var(--muted); font-weight: 400; }
+/* 차량 묶음 셀 — 같은 차량의 작업들이 한 덩어리로 읽히게 경계를 준다 */
+.cost-table td.car-group { border-right: 1px solid var(--grid); vertical-align: top; padding-top: 10px; }
+.cost-table td.car-group .sub { margin-top: 2px; font-variant-numeric: tabular-nums; }
+.cost-table td[rowspan] { background: var(--plane); }
+
+.works-table td.reason-cell { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+.works-table .pale { color: var(--muted); }
+.car-cell { min-width: 168px; }
+.memo {
+  display: block; width: 100%; margin-top: 5px; font: inherit; font-size: 12.5px;
+  padding: 4px 8px; color: var(--ink); background: var(--plane);
+  border: 1px solid var(--grid); border-radius: 6px;
+}
+.memo::placeholder { color: var(--muted); }
+.memo:focus { outline: 2px solid var(--hanta); outline-offset: -1px; border-color: transparent; }
+.memo.has-value { background: var(--card); border-color: var(--axis); }
+.empty-hint { margin: 12px 0 4px; font-size: 13px; color: var(--muted); }
+
+.day { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 20px 6px; }
+.day-head { flex-wrap: wrap; gap: 4px 14px; padding: 4px 0 8px; }
+.day-head h3 { margin: 0; font-size: 17px; font-weight: 640; font-variant-numeric: tabular-nums; color: var(--ink); }
+.day-facts { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--ink-2); }
+.day-facts b { font-weight: 640; color: var(--ink); font-variant-numeric: tabular-nums; }
+.better b, .better { color: var(--good); }
+.worse b, .worse { color: var(--crit); }
+
+td.elapsed { min-width: 168px; }
+.bar { display: inline-block; width: 96px; height: 8px; background: var(--grid); border-radius: 4px; overflow: hidden; vertical-align: middle; }
+.fill { display: block; height: 100%; border-radius: 4px; }
+td.elapsed .val { margin-left: 9px; font-variant-numeric: tabular-nums; font-weight: 620; }
+
+.tag {
+  display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px;
+  margin: 1px 3px 1px 0; white-space: nowrap; color: var(--ink);
+}
+.tag.main { background: var(--act-main-soft); border: 1px solid var(--act-main); }
+.tag.alt { background: var(--act-alt-soft); border: 1px solid var(--act-alt); }
+.tag.none { color: var(--muted); }
+
+tr.detail-row td { border-bottom: 1px solid var(--grid); padding: 0 10px 8px; }
+.detail-body { display: flex; flex-wrap: wrap; gap: 10px 32px; padding: 6px 0 10px; }
+.block { min-width: 260px; flex: 1; }
+.block h4 { margin: 0 0 4px; font-size: 12px; font-weight: 620; color: var(--muted); }
+ol.works { margin: 0; padding-left: 18px; }
+ol.works > li { margin-bottom: 6px; }
+ul.notify, ul.reason { margin: 2px 0 0; padding-left: 18px; color: var(--ink-2); }
+ul.reason li { font-size: 13px; }
+.reason.pale { color: var(--muted); font-size: 13px; margin: 2px 0 0; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="wrap">
+<header>
+  <h1>유리·틴팅 진단 소요시간 추적</h1>
+  <p class="lede">유리, 틴팅 진단을 분리한 뒤, 대당 소요 시간이 어떻게 변화하는지 확인하기 위한 리포트입니다.</p>
+  <div class="dates">
+    <span><span class="k">시작일</span>2026년 7월 30일</span>
+    <span><span class="k">기준일</span><span class="as-of">2026년 7월 31일</span></span>
+  </div>
+</header>
+
+<div class="stats"><div class="stat-card">
+  <div class="stat-head"><span class="dot" style="background:var(--rei)"></span>
+    틴팅 진단 · REI</div>
+  <div class="stat-row"><span class="stat-label">평균 소요 시간</span><span class="stat-value">3:25</span></div><div class="stat-row"><span class="stat-label">최대 소요 시간</span><span class="stat-value">6:19</span></div><div class="stat-row"><span class="stat-label">최소 소요 시간</span><span class="stat-value">1:31</span></div>
+  <div class="stat-row count-row">
+    <span class="stat-label">진단 차량</span>
+    <span class="stat-value">오늘 5대 · 누적 19대</span>
+  </div>
+</div><div class="stat-card">
+  <div class="stat-head"><span class="dot" style="background:var(--hanta)"></span>
+    유리 진단 · HANTA</div>
+  <div class="stat-row"><span class="stat-label">평균 소요 시간</span><span class="stat-value">3:04</span></div><div class="stat-row"><span class="stat-label">최대 소요 시간</span><span class="stat-value">3:37</span></div><div class="stat-row"><span class="stat-label">최소 소요 시간</span><span class="stat-value">1:46</span></div>
+  <div class="stat-row count-row">
+    <span class="stat-label">진단 차량</span>
+    <span class="stat-value">오늘 5대 · 누적 19대</span>
+  </div>
+</div></div>
+
+<section>
+  <div class="sec-head">
+    <h2>일자별 평균 소요 시간</h2>
+    <p class="sec-sub">진단자별 · 차량 한 대당 평균</p>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <h3>날짜별 비교</h3>
+      <div class="legend"><span class="legend-item"><span class="swatch" style="background:var(--rei)"></span>REI</span><span class="legend-item"><span class="swatch" style="background:var(--hanta)"></span>HANTA</span></div>
+    </div>
+    <div class="chart-wrap" data-chart="daily-mean" data-payload='{&quot;labels&quot;: [&quot;07/30&quot;, &quot;07/31&quot;], &quot;series&quot;: [{&quot;name&quot;: &quot;REI&quot;, &quot;color&quot;: &quot;var(--rei)&quot;, &quot;values&quot;: [443.7142857142857, 204.6]}, {&quot;name&quot;: &quot;HANTA&quot;, &quot;color&quot;: &quot;var(--hanta)&quot;, &quot;values&quot;: [501.85714285714283, 183.8]}], &quot;padL&quot;: 54, &quot;band&quot;: 110.0, &quot;width&quot;: 760}'><svg viewBox="0 0 760 300" class="chart" role="img" aria-label="일자별 평균 소요시간 막대 그래프"><line class="grid" x1="54" y1="258.0" x2="740" y2="258.0"/><text class="tick" x="44" y="262.0" text-anchor="end">0분</text><line class="grid" x1="54" y1="210.8" x2="740" y2="210.8"/><text class="tick" x="44" y="214.8" text-anchor="end">2분</text><line class="grid" x1="54" y1="163.6" x2="740" y2="163.6"/><text class="tick" x="44" y="167.6" text-anchor="end">4분</text><line class="grid" x1="54" y1="116.4" x2="740" y2="116.4"/><text class="tick" x="44" y="120.4" text-anchor="end">6분</text><line class="grid" x1="54" y1="69.2" x2="740" y2="69.2"/><text class="tick" x="44" y="73.2" text-anchor="end">8분</text><line class="grid" x1="54" y1="22.0" x2="740" y2="22.0"/><text class="tick" x="44" y="26.0" text-anchor="end">10분</text><rect class="band" id="daily-mean-band" x="0" y="22" width="110.0" height="236"/><text class="tick" x="109.0" y="278" text-anchor="middle">07/30</text><path class="bar" d="M84.0 258.0 V87.5 Q84.0 83.5 88.0 83.5 H104.0 Q108.0 83.5 108.0 87.5 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="96.0" y="77.5" text-anchor="middle">7:24</text><path class="bar" d="M110.0 258.0 V64.6 Q110.0 60.6 114.0 60.6 H130.0 Q134.0 60.6 134.0 64.6 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="122.0" y="54.6" text-anchor="middle">8:22</text><text class="tick" x="219.0" y="278" text-anchor="middle">07/31</text><path class="bar" d="M194.0 258.0 V181.5 Q194.0 177.5 198.0 177.5 H214.0 Q218.0 177.5 218.0 181.5 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="206.0" y="171.5" text-anchor="middle">3:25</text><path class="bar" d="M220.0 258.0 V189.7 Q220.0 185.7 224.0 185.7 H240.0 Q244.0 185.7 244.0 189.7 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="232.0" y="179.7" text-anchor="middle">3:04</text><rect id="daily-mean-hit" x="54" y="22" width="220.0" height="236" fill="transparent"/></svg><div class="tooltip" id="daily-mean-tip" hidden></div></div>
+    <details class="table-view"><summary>표로 보기</summary>
+<div class="table-scroll"><table class="daily">
+<thead><tr><th>일자</th><th>REI</th><th>HANTA</th></tr></thead>
+<tbody><tr><th scope='row' class='mono'>07/30</th><td class='mono'>7:24</td><td class='mono'>8:22</td></tr><tr><th scope='row' class='mono'>07/31</th><td class='mono'>3:25</td><td class='mono'>3:04</td></tr></tbody></table></div></details>
+  </div>
+</section>
+
+<section id="tinting">
+  <div class="sec-head">
+    <h2>틴팅 진단</h2>
+    <p class="sec-sub">REI</p>
+  </div>
+  <div class="card work-card" data-filterable="works-tinting">
+  <div class="work-head">
+    <h3>작업 판단 사유</h3>
+    <div class="donut-wrap">
+  <svg viewBox="0 0 116 116" class="donut" role="img"
+       aria-label="판단 구성 148건의 조치별 비율">
+    <circle cx="58.0" cy="58.0" r="48.50" fill="none"
+            stroke="var(--grid)" stroke-width="19"/>
+    <circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-main)" stroke-width="19" stroke-dasharray="41.24 263.50" stroke-dashoffset="-0.00" transform="rotate(-90 58.0 58.0)"><title>새로 시공 21건</title></circle><circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-alt)" stroke-width="19" stroke-dasharray="6.24 298.50" stroke-dashoffset="-43.24" transform="rotate(-90 58.0 58.0)"><title>필름 제거 4건</title></circle><circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-notify)" stroke-width="19" stroke-dasharray="251.26 53.48" stroke-dashoffset="-51.48" transform="rotate(-90 58.0 58.0)"><title>고지 123건</title></circle>
+    <text x="58.0" y="56.0" class="donut-total" text-anchor="middle">148</text>
+    <text x="58.0" y="72.0" class="donut-cap" text-anchor="middle">건</text>
+  </svg>
+  <div class="donut-legend"><div class="donut-row"><span class="swatch" style="background:var(--act-main)"></span><span class="donut-label">새로 시공</span><span class="donut-num">21건</span><span class="donut-pct">14%</span></div><div class="donut-row"><span class="swatch" style="background:var(--act-alt)"></span><span class="donut-label">필름 제거</span><span class="donut-num">4건</span><span class="donut-pct">3%</span></div><div class="donut-row"><span class="swatch" style="background:var(--act-notify)"></span><span class="donut-label">고지</span><span class="donut-num">123건</span><span class="donut-pct">83%</span></div></div>
+</div>
+  </div>
+  <details>
+    <summary>일자별 조회 · 건별 근거 · 메모 보기</summary>
+    <div class="work-body">
+      <div class="calendar">
+  <div class="cal-head">
+    <button type="button" class="cal-all is-on" data-date="all" aria-pressed="true">전체 기간</button>
+    <span class="cal-hint">날짜를 누르면 그날 판단만 봅니다 · 숫자는 작업 건수</span>
+  </div>
+  <div class="cal-month">
+  <div class="cal-title">2026년 7월</div>
+  <div class="cal-grid"><span class="cal-wd">일</span><span class="cal-wd">월</span><span class="cal-wd">화</span><span class="cal-wd">수</span><span class="cal-wd">목</span><span class="cal-wd">금</span><span class="cal-wd">토</span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-day off">1</span><span class="cal-day off">2</span><span class="cal-day off">3</span><span class="cal-day off">4</span><span class="cal-day off">5</span><span class="cal-day off">6</span><span class="cal-day off">7</span><span class="cal-day off">8</span><span class="cal-day off">9</span><span class="cal-day off">10</span><span class="cal-day off">11</span><span class="cal-day off">12</span><span class="cal-day off">13</span><span class="cal-day off">14</span><span class="cal-day off">15</span><span class="cal-day off">16</span><span class="cal-day off">17</span><span class="cal-day off">18</span><span class="cal-day off">19</span><span class="cal-day off">20</span><span class="cal-day off">21</span><span class="cal-day off">22</span><span class="cal-day off">23</span><span class="cal-day off">24</span><span class="cal-day off">25</span><span class="cal-day off">26</span><span class="cal-day off">27</span><span class="cal-day off">28</span><span class="cal-day off">29</span><button type="button" class="cal-day on" data-date="2026-07-30" aria-pressed="false">30<span class="cal-count">21</span></button><button type="button" class="cal-day on" data-date="2026-07-31" aria-pressed="false">31<span class="cal-count">4</span></button></div>
+</div>
+</div>
+      <div class="table-scroll"><table class="works-table">
+  <thead><tr><th>일자</th><th>차량 · 메모</th><th>부위</th><th>조치</th><th>판단 근거</th></tr></thead>
+  <tbody><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>157부****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|157부****|전면 유리|새로 시공"
+           placeholder="메모" aria-label="157부**** 새로 시공 메모">
+  </td>
+  <td>전면 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell">전면(운전석) 선 긁힘 6~9cm 4개<br>전면(운전석) 면 뜯김 10mm 이상 1개</td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>157부****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|157부****|운1열 유리|새로 시공"
+           placeholder="메모" aria-label="157부**** 새로 시공 메모">
+  </td>
+  <td>운1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell">조1열(앞면) 면 뜯김 10mm 이상 1개</td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>157부****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|157부****|조1열 유리|새로 시공"
+           placeholder="메모" aria-label="157부**** 새로 시공 메모">
+  </td>
+  <td>조1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell"><span class='pale'>직접 관찰 없음 · 운1열 유리와 짝으로 함께 시공</span></td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>41주****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|41주****|전면 유리|새로 시공"
+           placeholder="메모" aria-label="41주**** 새로 시공 메모">
+  </td>
+  <td>전면 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell">전면(운전석) 선 긁힘 6~9cm 1개</td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>12구****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|12구****|전면 유리|필름 제거"
+           placeholder="메모" aria-label="12구**** 필름 제거 메모">
+  </td>
+  <td>전면 유리</td>
+  <td><span class="tag alt">필름 제거</span></td>
+  <td class="reason-cell">전면(운전석) 면 뜯김 10mm 이상 1개</td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>42수****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|42수****|운1열 유리|새로 시공"
+           placeholder="메모" aria-label="42수**** 새로 시공 메모">
+  </td>
+  <td>운1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell"><span class='pale'>직접 관찰 없음 · 조1열 유리와 짝으로 함께 시공</span></td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>42수****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|42수****|조1열 유리|새로 시공"
+           placeholder="메모" aria-label="42수**** 새로 시공 메모">
+  </td>
+  <td>조1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell">운1열(후면) 선 긁힘 10cm 이상 1개<br>조1열(후면) 선 긁힘 10cm 이상 2개</td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>24모****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|24모****|전면 유리|필름 제거"
+           placeholder="메모" aria-label="24모**** 필름 제거 메모">
+  </td>
+  <td>전면 유리</td>
+  <td><span class="tag alt">필름 제거</span></td>
+  <td class="reason-cell">전면(운전석) 선 긁힘 10cm 이상 1개</td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>24모****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|24모****|운1열 유리|새로 시공"
+           placeholder="메모" aria-label="24모**** 새로 시공 메모">
+  </td>
+  <td>운1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell">운1열(앞면) 선 긁힘 1~5cm 4개</td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>24모****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|24모****|조1열 유리|새로 시공"
+           placeholder="메모" aria-label="24모**** 새로 시공 메모">
+  </td>
+  <td>조1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell">운1열(후면) 선 긁힘 6~9cm 4개<br>조1열(후면) 선 긁힘 1~5cm 8개</td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>24모****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|24모****|운2열 쿼터 글라스|새로 시공"
+           placeholder="메모" aria-label="24모**** 새로 시공 메모">
+  </td>
+  <td>운2열 쿼터 글라스</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell">운2열(쪽창) 면 뜯김 10mm 이상 2개</td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>24모****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|24모****|조2열 쿼터 글라스|새로 시공"
+           placeholder="메모" aria-label="24모**** 새로 시공 메모">
+  </td>
+  <td>조2열 쿼터 글라스</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell"><span class='pale'>직접 관찰 없음 · 운2열 쿼터 글라스와 짝으로 함께 시공</span></td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>04버****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|04버****|운1열 유리|새로 시공"
+           placeholder="메모" aria-label="04버**** 새로 시공 메모">
+  </td>
+  <td>운1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell"><span class='pale'>직접 관찰 없음 · 조1열 유리와 짝으로 함께 시공</span></td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>04버****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|04버****|조1열 유리|새로 시공"
+           placeholder="메모" aria-label="04버**** 새로 시공 메모">
+  </td>
+  <td>조1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell">조1열(후면) 선 긁힘 10cm 이상 1개</td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>04버****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|04버****|후면|필름 제거"
+           placeholder="메모" aria-label="04버**** 필름 제거 메모">
+  </td>
+  <td>후면</td>
+  <td><span class="tag alt">필름 제거</span></td>
+  <td class="reason-cell">후면 기포 1cm x 1cm 이상 8개</td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>11누****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|11누****|운1열 유리|새로 시공"
+           placeholder="메모" aria-label="11누**** 새로 시공 메모">
+  </td>
+  <td>운1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell">운1열(앞면) 선 긁힘 10cm 이상 1개<br>조1열(앞면) 면 뜯김 10mm 이상 1개</td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>11누****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|11누****|조1열 유리|새로 시공"
+           placeholder="메모" aria-label="11누**** 새로 시공 메모">
+  </td>
+  <td>조1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell"><span class='pale'>직접 관찰 없음 · 운1열 유리와 짝으로 함께 시공</span></td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>222수****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|222수****|운1열 유리|새로 시공"
+           placeholder="메모" aria-label="222수**** 새로 시공 메모">
+  </td>
+  <td>운1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell">운1열(앞면) 틴팅 소음</td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>222수****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|222수****|조1열 유리|새로 시공"
+           placeholder="메모" aria-label="222수**** 새로 시공 메모">
+  </td>
+  <td>조1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell">운1열(후면) 틴팅 소음</td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>110우****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|110우****|운2열 유리|새로 시공"
+           placeholder="메모" aria-label="110우**** 새로 시공 메모">
+  </td>
+  <td>운2열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell"><span class='pale'>직접 관찰 없음 · 조2열 유리와 짝으로 함께 시공</span></td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>110우****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-30|110우****|조2열 유리|새로 시공"
+           placeholder="메모" aria-label="110우**** 새로 시공 메모">
+  </td>
+  <td>조2열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell">조2열 틴팅 소음</td>
+</tr><tr data-date="2026-07-31">
+  <td class="mono">07/31</td>
+  <td class="car-cell">
+    <strong>223버****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-31|223버****|전면 유리|새로 시공"
+           placeholder="메모" aria-label="223버**** 새로 시공 메모">
+  </td>
+  <td>전면 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell">전면(운전석) 본드, 하드코트 손상</td>
+</tr><tr data-date="2026-07-31">
+  <td class="mono">07/31</td>
+  <td class="car-cell">
+    <strong>47누****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-31|47누****|운1열 유리|새로 시공"
+           placeholder="메모" aria-label="47누**** 새로 시공 메모">
+  </td>
+  <td>운1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell"><span class='pale'>직접 관찰 없음 · 조1열 유리와 짝으로 함께 시공</span></td>
+</tr><tr data-date="2026-07-31">
+  <td class="mono">07/31</td>
+  <td class="car-cell">
+    <strong>47누****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-31|47누****|조1열 유리|새로 시공"
+           placeholder="메모" aria-label="47누**** 새로 시공 메모">
+  </td>
+  <td>조1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell">조1열(후면) 선 긁힘 10cm 이상 1개</td>
+</tr><tr data-date="2026-07-31">
+  <td class="mono">07/31</td>
+  <td class="car-cell">
+    <strong>47누****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-07-31|47누****|후면|필름 제거"
+           placeholder="메모" aria-label="47누**** 필름 제거 메모">
+  </td>
+  <td>후면</td>
+  <td><span class="tag alt">필름 제거</span></td>
+  <td class="reason-cell">후면 스티커 제거 후 빛바램</td>
+</tr></tbody></table></div>
+  <p class="empty-hint" hidden>선택한 날짜에는 작업 판단이 없습니다.</p>
+      <p class="note">메모는 이 브라우저에만 저장됩니다. 다른 PC나 다른 사람 화면에는 보이지 않습니다.</p>
+    </div>
+  </details>
+</div>
+  <details class="day">
+  <summary class="day-head">
+    <h3>2026.07.31</h3>
+    <div class="day-facts">
+      <span><b>5</b>대</span>
+      <span>평균 <b>3:25</b></span>
+      <span>최단 <b>1:31</b> · 최장 <b>6:19</b></span>
+      <span>작업 판단 <b>4</b>건</span>
+      <span class="worse">전반 2:45 → 후반 3:51
+        (+40%)</span>
+    </div>
+  </summary>
+  <div class="table-scroll"><table class="detail">
+<thead><tr>
+  <th>순번</th><th>완료</th><th>차량</th><th>소요시간</th><th>작업</th><th>고지</th>
+</tr></thead>
+<tbody><tr>
+  <td class="num">1</td>
+  <td class="mono">10:06</td>
+  <td><strong>07라****</strong><span class="sub">현대 LF 쏘나타 (14년~17년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:57.8%;background:var(--rei)"></span></span>
+    <span class="val">3:39</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">3</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 3건</h4><ul class='notify'><li>[틴팅] 전면(운전석) 스티커(자국 포함)</li><li>[틴팅] 전면(운전석) 선 긁힘 1cm 미만 1개</li><li>[틴팅] 전면(조수석) 선 긁힘 1~5cm 2개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">2</td>
+  <td class="mono">10:09</td>
+  <td><strong>360마****</strong><span class="sub">현대 아반떼 AD (15년~18년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:29.3%;background:var(--rei)"></span></span>
+    <span class="val">1:51</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">0</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><p class='reason pale'>작업·고지 판단이 없는 차량입니다.</p></div></div></details>
+</td></tr><tr>
+  <td class="num">3</td>
+  <td class="mono">10:14</td>
+  <td><strong>223버****</strong><span class="sub">현대 쏘나타 (DN8) (19년~23년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:58.8%;background:var(--rei)"></span></span>
+    <span class="val">3:43</span>
+  </td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="num">2</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>전면 유리-새로 시공</strong><ul class='reason'><li>전면(운전석) 본드, 하드코트 손상</li></ul></li></ol></div><div class='block'><h4>고지 항목 2건</h4><ul class='notify'><li>[틴팅] 운1열(후면) 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 운2열 선 긁힘 1cm 미만 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">4</td>
+  <td class="mono">10:16</td>
+  <td><strong>241저****</strong><span class="sub">기아 더 뉴 기아 레이 (22년~현재)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:24.0%;background:var(--rei)"></span></span>
+    <span class="val">1:31</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">0</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><p class='reason pale'>작업·고지 판단이 없는 차량입니다.</p></div></div></details>
+</td></tr><tr>
+  <td class="num">5</td>
+  <td class="mono">10:24</td>
+  <td><strong>47누****</strong><span class="sub">현대 싼타페 DM (12년~15년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:100.0%;background:var(--rei)"></span></span>
+    <span class="val">6:19</span>
+  </td>
+  <td><span class="tag main">새로 시공</span><span class="tag main">새로 시공</span><span class="tag alt">필름 제거</span></td>
+  <td class="num">4</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>운1열 유리-새로 시공</strong><p class='reason pale'>직접 관찰 없음 · 조1열 유리 판단에 따라 짝으로 함께 시공</p></li><li><strong>조1열 유리-새로 시공</strong><ul class='reason'><li>조1열(후면) 선 긁힘 10cm 이상 1개</li></ul></li><li><strong>후면-필름 제거</strong><ul class='reason'><li>후면 스티커 제거 후 빛바램</li></ul></li></ol></div><div class='block'><h4>고지 항목 4건</h4><ul class='notify'><li>[틴팅] 전면(운전석) 선 긁힘 1~5cm 2개</li><li>[틴팅] 전면(운전석) 스티커(자국 포함)</li><li>[틴팅] 운2열 선 긁힘 1cm 미만 1개</li><li>[틴팅] 조2열 선 긁힘 1cm 미만 1개</li></ul></div></div></details>
+</td></tr></tbody>
+</table></div>
+</details><details class="day">
+  <summary class="day-head">
+    <h3>2026.07.30</h3>
+    <div class="day-facts">
+      <span><b>14</b>대</span>
+      <span>평균 <b>7:24</b></span>
+      <span>최단 <b>2:21</b> · 최장 <b>23:24</b></span>
+      <span>작업 판단 <b>21</b>건</span>
+      <span class="better">전반 9:47 → 후반 5:00
+        (-49%)</span>
+    </div>
+  </summary>
+  <div class="table-scroll"><table class="detail">
+<thead><tr>
+  <th>순번</th><th>완료</th><th>차량</th><th>소요시간</th><th>작업</th><th>고지</th>
+</tr></thead>
+<tbody><tr>
+  <td class="num">1</td>
+  <td class="mono">16:44</td>
+  <td><strong>157부****</strong><span class="sub">기아 K5 3세대 (19년~23년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:34.3%;background:var(--rei)"></span></span>
+    <span class="val">8:02</span>
+  </td>
+  <td><span class="tag main">새로 시공</span><span class="tag main">새로 시공</span><span class="tag main">새로 시공</span></td>
+  <td class="num">2</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>전면 유리-새로 시공</strong><ul class='reason'><li>전면(운전석) 선 긁힘 6~9cm 4개</li><li>전면(운전석) 면 뜯김 10mm 이상 1개</li></ul></li><li><strong>운1열 유리-새로 시공</strong><ul class='reason'><li>조1열(앞면) 면 뜯김 10mm 이상 1개</li></ul></li><li><strong>조1열 유리-새로 시공</strong><p class='reason pale'>직접 관찰 없음 · 운1열 유리 판단에 따라 짝으로 함께 시공</p></li></ol></div><div class='block'><h4>고지 항목 2건</h4><ul class='notify'><li>[틴팅] 운2열 점 찍힘 1개</li><li>[틴팅] 운2열 선 긁힘 1~5cm 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">2</td>
+  <td class="mono">16:55</td>
+  <td><strong>41주****</strong><span class="sub">기아 더 뉴 카렌스 (16년~18년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:28.3%;background:var(--rei)"></span></span>
+    <span class="val">6:37</span>
+  </td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="num">6</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>전면 유리-새로 시공</strong><ul class='reason'><li>전면(운전석) 선 긁힘 6~9cm 1개</li></ul></li></ol></div><div class='block'><h4>고지 항목 6건</h4><ul class='notify'><li>[틴팅] 운1열(후면) 점 찍힘 2개</li><li>[틴팅] 조1열(후면) 점 찍힘 1개</li><li>[틴팅] 운2열 선 긁힘 1cm 미만 1개</li><li>[틴팅] 운2열 선 긁힘 1~5cm 1개</li><li>[틴팅] 조2열 선 긁힘 1~5cm 1개</li><li>[틴팅] 후면 선 긁힘 1cm 미만 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">3</td>
+  <td class="mono">17:20</td>
+  <td><strong>12구****</strong><span class="sub">기아 프라이드(신형) (05년~11년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:100.0%;background:var(--rei)"></span></span>
+    <span class="val">23:24</span>
+  </td>
+  <td><span class="tag alt">필름 제거</span></td>
+  <td class="num">14</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>전면 유리-필름 제거</strong><ul class='reason'><li>전면(운전석) 면 뜯김 10mm 이상 1개</li></ul></li></ol></div><div class='block'><h4>고지 항목 14건</h4><ul class='notify'><li>[틴팅] 운1열(앞면) 선 긁힘 1cm 미만 1개</li><li>[틴팅] 운1열(후면) 선 긁힘 1~5cm 2개</li><li>[틴팅] 운1열(후면) 선 긁힘 6~9cm 1개</li><li>[틴팅] 운1열(후면) 선 긁힘 1cm 미만 2개</li><li>[틴팅] 조1열(후면) 점 찍힘 3개</li><li>[틴팅] 조1열(후면) 선 긁힘 1cm 미만 2개</li><li>[틴팅] 운2열 점 찍힘 2개</li><li>[틴팅] 운2열 선 긁힘 1~5cm 3개</li><li>[틴팅] 조2열 점 찍힘 3개</li><li>[틴팅] 조2열 선 긁힘 1cm 미만 6개</li><li>[틴팅] 후면 선 긁힘 1~5cm 3개</li><li>[틴팅] 운2열(쪽창) 점 찍힘 5개</li><li>[틴팅] 조2열(쪽창) 선 긁힘 1cm 미만 1개</li><li>[틴팅] 조2열(쪽창) 선 긁힘 1~5cm 3개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">4</td>
+  <td class="mono">17:27</td>
+  <td><strong>51소****</strong><span class="sub">기아 모하비 (07년~16년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:30.3%;background:var(--rei)"></span></span>
+    <span class="val">7:06</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">10</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 10건</h4><ul class='notify'><li>[틴팅] 조1열(앞면) 점 찍힘 4개</li><li>[틴팅] 운1열(후면) 점 찍힘 2개</li><li>[틴팅] 운1열(후면) 선 긁힘 1~5cm 6개</li><li>[틴팅] 조1열(후면) 점 찍힘 1개</li><li>[틴팅] 조1열(후면) 선 긁힘 1~5cm 1개</li><li>[틴팅] 운2열 면 뜯김 5~9mm 1개</li><li>[틴팅] 운2열 선 긁힘 1~5cm 3개</li><li>[틴팅] 운2열 면 뜯김 5mm 미만 1개</li><li>[틴팅] 조2열 점 찍힘 4개</li><li>[틴팅] 운3열 선 긁힘 6~9cm 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">5</td>
+  <td class="mono">17:37</td>
+  <td><strong>378모****</strong><span class="sub">기아 뉴 모닝 (08년~11년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:28.8%;background:var(--rei)"></span></span>
+    <span class="val">6:44</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">14</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 14건</h4><ul class='notify'><li>[틴팅] 전면(운전석) 스티커(자국 포함)</li><li>[틴팅] 전면(조수석) 점 찍힘 1개</li><li>[틴팅] 운1열(앞면) 점 찍힘 1개</li><li>[틴팅] 조1열(앞면) 선 긁힘 1~5cm 1개</li><li>[틴팅] 운1열(후면) 점 찍힘 6개</li><li>[틴팅] 운1열(후면) 선 긁힘 1cm 미만 2개</li><li>[틴팅] 조1열(후면) 선 긁힘 1~5cm 1개</li><li>[틴팅] 운2열 선 긁힘 6~9cm 1개</li><li>[틴팅] 운2열 선 긁힘 1cm 미만 2개</li><li>[틴팅] 조2열 선 긁힘 1cm 미만 4개</li><li>[틴팅] 조2열 선 긁힘 1~5cm 1개</li><li>[틴팅] 후면 점 찍힘 3개</li><li>[틴팅] 후면 면 뜯김 5mm 미만 1개</li><li>[틴팅] 후면 선 긁힘 1cm 미만 2개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">6</td>
+  <td class="mono">17:48</td>
+  <td><strong>42수****</strong><span class="sub">랜드로버 레인지로버 스포츠 2세대 (13년~22년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:39.0%;background:var(--rei)"></span></span>
+    <span class="val">9:07</span>
+  </td>
+  <td><span class="tag main">새로 시공</span><span class="tag main">새로 시공</span></td>
+  <td class="num">11</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>운1열 유리-새로 시공</strong><p class='reason pale'>직접 관찰 없음 · 조1열 유리 판단에 따라 짝으로 함께 시공</p></li><li><strong>조1열 유리-새로 시공</strong><ul class='reason'><li>운1열(후면) 선 긁힘 10cm 이상 1개</li><li>조1열(후면) 선 긁힘 10cm 이상 2개</li></ul></li></ol></div><div class='block'><h4>고지 항목 11건</h4><ul class='notify'><li>[틴팅] 운2열 선 긁힘 6~9cm 1개</li><li>[틴팅] 운2열 본드, 하드코트 손상</li><li>[틴팅] 운2열 선 긁힘 1cm 미만 4개</li><li>[틴팅] 조2열 점 찍힘 1개</li><li>[틴팅] 조2열 선 긁힘 6~9cm 1개</li><li>[틴팅] 조2열 선 긁힘 10cm 이상 1개</li><li>[틴팅] 조2열 본드, 하드코트 손상</li><li>[틴팅] 조2열 선 긁힘 1~5cm 1개</li><li>[틴팅] 운3열 선 긁힘 6~9cm 1개</li><li>[틴팅] 운3열 선 긁힘 1~5cm 2개</li><li>[틴팅] 조3열 선 긁힘 1~5cm 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">7</td>
+  <td class="mono">17:57</td>
+  <td><strong>24모****</strong><span class="sub">기아 뉴 모닝 (08년~11년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:32.0%;background:var(--rei)"></span></span>
+    <span class="val">7:29</span>
+  </td>
+  <td><span class="tag alt">필름 제거</span><span class="tag main">새로 시공</span><span class="tag main">새로 시공</span><span class="tag main">새로 시공</span><span class="tag main">새로 시공</span></td>
+  <td class="num">4</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>전면 유리-필름 제거</strong><ul class='reason'><li>전면(운전석) 선 긁힘 10cm 이상 1개</li></ul></li><li><strong>운1열 유리-새로 시공</strong><ul class='reason'><li>운1열(앞면) 선 긁힘 1~5cm 4개</li></ul></li><li><strong>조1열 유리-새로 시공</strong><ul class='reason'><li>운1열(후면) 선 긁힘 6~9cm 4개</li><li>조1열(후면) 선 긁힘 1~5cm 8개</li></ul></li><li><strong>운2열 쿼터 글라스-새로 시공</strong><ul class='reason'><li>운2열(쪽창) 면 뜯김 10mm 이상 2개</li></ul></li><li><strong>조2열 쿼터 글라스-새로 시공</strong><p class='reason pale'>직접 관찰 없음 · 운2열 쿼터 글라스 판단에 따라 짝으로 함께 시공</p></li></ol></div><div class='block'><h4>고지 항목 4건</h4><ul class='notify'><li>[틴팅] 운2열 본드, 하드코트 손상</li><li>[틴팅] 운2열 선 긁힘 1~5cm 4개</li><li>[틴팅] 조2열 본드, 하드코트 손상</li><li>[틴팅] 조2열 선 긁힘 1~5cm 8개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">8</td>
+  <td class="mono">18:17</td>
+  <td><strong>228가****</strong><span class="sub">기아 더 뉴 기아 레이 (22년~현재)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:25.3%;background:var(--rei)"></span></span>
+    <span class="val">5:55</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">12</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 12건</h4><ul class='notify'><li>[틴팅] 전면(운전석) 스티커(자국 포함)</li><li>[틴팅] 전면(운전석) 선 긁힘 1cm 미만 1개</li><li>[틴팅] 운1열(앞면) 점 찍힘 1개</li><li>[틴팅] 운1열(후면) 선 긁힘 1~5cm 1개</li><li>[틴팅] 조1열(후면) 점 찍힘 1개</li><li>[틴팅] 운2열 점 찍힘 1개</li><li>[틴팅] 운2열 얕은 실 긁힘, 점 찍힘 2개</li><li>[틴팅] 조2열 점 찍힘 8개</li><li>[틴팅] 조2열 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 조2열 선 긁힘 1cm 미만 2개</li><li>[틴팅] 후면 얕은 실 긁힘, 점 찍힘 2개</li><li>[틴팅] 조2열(쪽창) 얕은 실 긁힘, 점 찍힘 3개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">9</td>
+  <td class="mono">18:26</td>
+  <td><strong>04버****</strong><span class="sub">기아 더 뉴 프라이드 (14년~17년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:35.5%;background:var(--rei)"></span></span>
+    <span class="val">8:19</span>
+  </td>
+  <td><span class="tag main">새로 시공</span><span class="tag main">새로 시공</span><span class="tag alt">필름 제거</span></td>
+  <td class="num">12</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>운1열 유리-새로 시공</strong><p class='reason pale'>직접 관찰 없음 · 조1열 유리 판단에 따라 짝으로 함께 시공</p></li><li><strong>조1열 유리-새로 시공</strong><ul class='reason'><li>조1열(후면) 선 긁힘 10cm 이상 1개</li></ul></li><li><strong>후면-필름 제거</strong><ul class='reason'><li>후면 기포 1cm x 1cm 이상 8개</li></ul></li></ol></div><div class='block'><h4>고지 항목 12건</h4><ul class='notify'><li>[틴팅] 전면(운전석) 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 전면(운전석) 선 긁힘 1cm 미만 1개</li><li>[틴팅] 전면(조수석) 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 전면(조수석) 스티커(자국 포함)</li><li>[틴팅] 운2열 점 찍힘 4개</li><li>[틴팅] 운2열 본드, 하드코트 손상</li><li>[틴팅] 운2열 선 긁힘 1cm 미만 1개</li><li>[틴팅] 운2열 스티커 제거 후 빛바램</li><li>[틴팅] 조2열 선 긁힘 6~9cm 1개</li><li>[틴팅] 조2열 본드, 하드코트 손상</li><li>[틴팅] 조2열 선 긁힘 1~5cm 1개</li><li>[틴팅] 운1열(쪽창) 선 긁힘 1~5cm 3개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">10</td>
+  <td class="mono">18:36</td>
+  <td><strong>11누****</strong><span class="sub">쉐보레(GM대우) 스파크 (11년~15년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:32.3%;background:var(--rei)"></span></span>
+    <span class="val">7:34</span>
+  </td>
+  <td><span class="tag main">새로 시공</span><span class="tag main">새로 시공</span></td>
+  <td class="num">12</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>운1열 유리-새로 시공</strong><ul class='reason'><li>운1열(앞면) 선 긁힘 10cm 이상 1개</li><li>조1열(앞면) 면 뜯김 10mm 이상 1개</li></ul></li><li><strong>조1열 유리-새로 시공</strong><p class='reason pale'>직접 관찰 없음 · 운1열 유리 판단에 따라 짝으로 함께 시공</p></li></ol></div><div class='block'><h4>고지 항목 12건</h4><ul class='notify'><li>[틴팅] 전면(운전석) 점 찍힘 3개</li><li>[틴팅] 운2열 얕은 실 긁힘, 점 찍힘 4개</li><li>[틴팅] 운2열 본드, 하드코트 손상</li><li>[틴팅] 운2열 스티커 제거 후 빛바램</li><li>[틴팅] 조2열 점 찍힘 1개</li><li>[틴팅] 조2열 선 긁힘 6~9cm 1개</li><li>[틴팅] 조2열 얕은 실 긁힘, 점 찍힘 3개</li><li>[틴팅] 조2열 본드, 하드코트 손상</li><li>[틴팅] 조2열 선 긁힘 1~5cm 1개</li><li>[틴팅] 후면 얕은 실 긁힘, 점 찍힘 3개</li><li>[틴팅] 후면 선 긁힘 1cm 미만 2개</li><li>[틴팅] 후면 선 긁힘 1~5cm 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">11</td>
+  <td class="mono">18:39</td>
+  <td><strong>222수****</strong><span class="sub">현대 더 뉴 아반떼 (CN7) (23년~현재)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:10.0%;background:var(--rei)"></span></span>
+    <span class="val">2:21</span>
+  </td>
+  <td><span class="tag main">새로 시공</span><span class="tag main">새로 시공</span></td>
+  <td class="num">0</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>운1열 유리-새로 시공</strong><ul class='reason'><li>운1열(앞면) 틴팅 소음</li></ul></li><li><strong>조1열 유리-새로 시공</strong><ul class='reason'><li>운1열(후면) 틴팅 소음</li></ul></li></ol></div></div></details>
+</td></tr><tr>
+  <td class="num">12</td>
+  <td class="mono">18:45</td>
+  <td><strong>110우****</strong><span class="sub">기아 K5 하이브리드 3세대 (19년~23년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:12.7%;background:var(--rei)"></span></span>
+    <span class="val">2:58</span>
+  </td>
+  <td><span class="tag main">새로 시공</span><span class="tag main">새로 시공</span></td>
+  <td class="num">3</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>운2열 유리-새로 시공</strong><p class='reason pale'>직접 관찰 없음 · 조2열 유리 판단에 따라 짝으로 함께 시공</p></li><li><strong>조2열 유리-새로 시공</strong><ul class='reason'><li>조2열 틴팅 소음</li></ul></li></ol></div><div class='block'><h4>고지 항목 3건</h4><ul class='notify'><li>[틴팅] 전면(조수석) 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 후면 점 찍힘 3개</li><li>[틴팅] 조2열(쪽창) 점 찍힘 3개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">13</td>
+  <td class="mono">18:51</td>
+  <td><strong>54다****</strong><span class="sub">현대 그랜저 IG (16년~19년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:17.4%;background:var(--rei)"></span></span>
+    <span class="val">4:04</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">6</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 6건</h4><ul class='notify'><li>[틴팅] 전면(조수석) 스티커(자국 포함)</li><li>[틴팅] 조1열(후면) 점 찍힘 1개</li><li>[틴팅] 조1열(후면) 선 긁힘 1~5cm 1개</li><li>[틴팅] 조1열(후면) 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 운2열 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 조2열 선 긁힘 1~5cm 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">14</td>
+  <td class="mono">18:59</td>
+  <td><strong>46로****</strong><span class="sub">현대 그랜저 IG (16년~19년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:16.5%;background:var(--rei)"></span></span>
+    <span class="val">3:52</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">8</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 8건</h4><ul class='notify'><li>[틴팅] 전면(운전석) 스티커(자국 포함)</li><li>[틴팅] 운1열(앞면) 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 운1열(후면) 점 찍힘 8개</li><li>[틴팅] 조1열(후면) 점 찍힘 2개</li><li>[틴팅] 조1열(후면) 선 긁힘 1cm 미만 1개</li><li>[틴팅] 운2열 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 조2열 선 긁힘 1~5cm 1개</li><li>[틴팅] 후면 기포 1cm x 1cm 미만 8개</li></ul></div></div></details>
+</td></tr></tbody>
+</table></div>
+</details>
+  <div class="card cost-card" data-filterable="cost-tinting"
+     data-amounts='{&quot;all&quot;: &quot;전체 기간 · 작업 25건&quot;, &quot;2026-07-30&quot;: &quot;7월 30일 · 작업 21건&quot;, &quot;2026-07-31&quot;: &quot;7월 31일 · 작업 4건&quot;}'>
+  <div class="card-head"><h3>상품화 작업 내역</h3></div>
+  <div class="cost-today">
+    <span class="stat-label">오늘 작업 건수</span>
+    <span class="cost-value">4건</span>
+    <span class="cost-sub">상품화가 필요하다고 판단한 작업 건수입니다</span>
+  </div>
+  <details class="cost-more">
+    <summary>월별 누적 · 일자별 조회 · 건별 내역 보기</summary>
+    <div class="cost-more-body">
+      <div class="cost-months">
+        <h4>월별 누적</h4>
+        <div class="stat-row"><span class="stat-label">2026년 7월</span>
+        <span class="stat-value month-value">25건</span></div>
+      </div>
+      <div class="calendar wide">
+  <div class="cal-head">
+    <button type="button" class="cal-all is-on" data-date="all" aria-pressed="true">전체 기간</button>
+    <span class="cal-hint">날짜를 누르면 그날 작업만 봅니다 · 숫자는 작업 건수</span>
+  </div>
+  <div class="cal-month">
+  <div class="cal-title">2026년 7월</div>
+  <div class="cal-grid"><span class="cal-wd">일</span><span class="cal-wd">월</span><span class="cal-wd">화</span><span class="cal-wd">수</span><span class="cal-wd">목</span><span class="cal-wd">금</span><span class="cal-wd">토</span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-day off">1</span><span class="cal-day off">2</span><span class="cal-day off">3</span><span class="cal-day off">4</span><span class="cal-day off">5</span><span class="cal-day off">6</span><span class="cal-day off">7</span><span class="cal-day off">8</span><span class="cal-day off">9</span><span class="cal-day off">10</span><span class="cal-day off">11</span><span class="cal-day off">12</span><span class="cal-day off">13</span><span class="cal-day off">14</span><span class="cal-day off">15</span><span class="cal-day off">16</span><span class="cal-day off">17</span><span class="cal-day off">18</span><span class="cal-day off">19</span><span class="cal-day off">20</span><span class="cal-day off">21</span><span class="cal-day off">22</span><span class="cal-day off">23</span><span class="cal-day off">24</span><span class="cal-day off">25</span><span class="cal-day off">26</span><span class="cal-day off">27</span><span class="cal-day off">28</span><span class="cal-day off">29</span><button type="button" class="cal-day on" data-date="2026-07-30" aria-pressed="false">30<span class="cal-count">21</span></button><button type="button" class="cal-day on" data-date="2026-07-31" aria-pressed="false">31<span class="cal-count">4</span></button></div>
+</div>
+</div>
+      <p class="sel-amount">전체 기간 · 작업 25건</p>
+      <div class="table-scroll"><table class="cost-table">
+  <thead><tr><th>일자</th><th>차량</th><th>부위</th><th>조치</th></tr></thead>
+  <tbody><tr data-date="2026-07-30">
+  <td class="mono" rowspan="3">07/30</td><td class="car-group" rowspan="3"><strong>157부****</strong><span class="sub">3건</span></td>
+  <td>전면 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  
+  <td>운1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  
+  <td>조1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  <td class="mono" rowspan="1">07/30</td><td class="car-group" rowspan="1"><strong>41주****</strong><span class="sub">1건</span></td>
+  <td>전면 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  <td class="mono" rowspan="1">07/30</td><td class="car-group" rowspan="1"><strong>12구****</strong><span class="sub">1건</span></td>
+  <td>전면 유리</td>
+  <td><span class="tag alt">필름 제거</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  <td class="mono" rowspan="2">07/30</td><td class="car-group" rowspan="2"><strong>42수****</strong><span class="sub">2건</span></td>
+  <td>운1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  
+  <td>조1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  <td class="mono" rowspan="5">07/30</td><td class="car-group" rowspan="5"><strong>24모****</strong><span class="sub">5건</span></td>
+  <td>전면 유리</td>
+  <td><span class="tag alt">필름 제거</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  
+  <td>운1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  
+  <td>조1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  
+  <td>운2열 쿼터 글라스</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  
+  <td>조2열 쿼터 글라스</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  <td class="mono" rowspan="3">07/30</td><td class="car-group" rowspan="3"><strong>04버****</strong><span class="sub">3건</span></td>
+  <td>운1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  
+  <td>조1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  
+  <td>후면</td>
+  <td><span class="tag alt">필름 제거</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  <td class="mono" rowspan="2">07/30</td><td class="car-group" rowspan="2"><strong>11누****</strong><span class="sub">2건</span></td>
+  <td>운1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  
+  <td>조1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  <td class="mono" rowspan="2">07/30</td><td class="car-group" rowspan="2"><strong>222수****</strong><span class="sub">2건</span></td>
+  <td>운1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  
+  <td>조1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  <td class="mono" rowspan="2">07/30</td><td class="car-group" rowspan="2"><strong>110우****</strong><span class="sub">2건</span></td>
+  <td>운2열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  
+  <td>조2열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-31">
+  <td class="mono" rowspan="1">07/31</td><td class="car-group" rowspan="1"><strong>223버****</strong><span class="sub">1건</span></td>
+  <td>전면 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-31">
+  <td class="mono" rowspan="3">07/31</td><td class="car-group" rowspan="3"><strong>47누****</strong><span class="sub">3건</span></td>
+  <td>운1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-31">
+  
+  <td>조1열 유리</td>
+  <td><span class="tag main">새로 시공</span></td>
+  
+</tr><tr data-date="2026-07-31">
+  
+  <td>후면</td>
+  <td><span class="tag alt">필름 제거</span></td>
+  
+</tr></tbody></table></div>
+  <p class="empty-hint" hidden>선택한 날짜에는 작업 건이 없습니다.</p>
+      <p class="note">작업에 드는 금액은 사내 자료라 이 공개 페이지에서는 빼고 건수만 보여줍니다. 금액이 필요하시면 사내 리포트를 확인해 주세요.</p>
+    </div>
+  </details>
+</div>
+</section><section id="glass">
+  <div class="sec-head">
+    <h2>유리 진단</h2>
+    <p class="sec-sub">HANTA</p>
+  </div>
+  <div class="card work-card" data-filterable="works-glass">
+  <div class="work-head">
+    <h3>작업 판단 사유</h3>
+    <div class="donut-wrap">
+  <svg viewBox="0 0 116 116" class="donut" role="img"
+       aria-label="판단 구성 84건의 조치별 비율">
+    <circle cx="58.0" cy="58.0" r="48.50" fill="none"
+            stroke="var(--grid)" stroke-width="19"/>
+    <circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-main)" stroke-width="19" stroke-dasharray="1.63 303.11" stroke-dashoffset="-0.00" transform="rotate(-90 58.0 58.0)"><title>교체 1건</title></circle><circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-alt)" stroke-width="19" stroke-dasharray="5.26 299.48" stroke-dashoffset="-3.63" transform="rotate(-90 58.0 58.0)"><title>유리 광택 2건</title></circle><circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-notify)" stroke-width="19" stroke-dasharray="291.85 12.88" stroke-dashoffset="-10.88" transform="rotate(-90 58.0 58.0)"><title>고지 81건</title></circle>
+    <text x="58.0" y="56.0" class="donut-total" text-anchor="middle">84</text>
+    <text x="58.0" y="72.0" class="donut-cap" text-anchor="middle">건</text>
+  </svg>
+  <div class="donut-legend"><div class="donut-row"><span class="swatch" style="background:var(--act-main)"></span><span class="donut-label">교체</span><span class="donut-num">1건</span><span class="donut-pct">1%</span></div><div class="donut-row"><span class="swatch" style="background:var(--act-alt)"></span><span class="donut-label">유리 광택</span><span class="donut-num">2건</span><span class="donut-pct">2%</span></div><div class="donut-row"><span class="swatch" style="background:var(--act-notify)"></span><span class="donut-label">고지</span><span class="donut-num">81건</span><span class="donut-pct">96%</span></div></div>
+</div>
+  </div>
+  <details>
+    <summary>일자별 조회 · 건별 근거 · 메모 보기</summary>
+    <div class="work-body">
+      <div class="calendar">
+  <div class="cal-head">
+    <button type="button" class="cal-all is-on" data-date="all" aria-pressed="true">전체 기간</button>
+    <span class="cal-hint">날짜를 누르면 그날 판단만 봅니다 · 숫자는 작업 건수</span>
+  </div>
+  <div class="cal-month">
+  <div class="cal-title">2026년 7월</div>
+  <div class="cal-grid"><span class="cal-wd">일</span><span class="cal-wd">월</span><span class="cal-wd">화</span><span class="cal-wd">수</span><span class="cal-wd">목</span><span class="cal-wd">금</span><span class="cal-wd">토</span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-day off">1</span><span class="cal-day off">2</span><span class="cal-day off">3</span><span class="cal-day off">4</span><span class="cal-day off">5</span><span class="cal-day off">6</span><span class="cal-day off">7</span><span class="cal-day off">8</span><span class="cal-day off">9</span><span class="cal-day off">10</span><span class="cal-day off">11</span><span class="cal-day off">12</span><span class="cal-day off">13</span><span class="cal-day off">14</span><span class="cal-day off">15</span><span class="cal-day off">16</span><span class="cal-day off">17</span><span class="cal-day off">18</span><span class="cal-day off">19</span><span class="cal-day off">20</span><span class="cal-day off">21</span><span class="cal-day off">22</span><span class="cal-day off">23</span><span class="cal-day off">24</span><span class="cal-day off">25</span><span class="cal-day off">26</span><span class="cal-day off">27</span><span class="cal-day off">28</span><span class="cal-day off">29</span><button type="button" class="cal-day on" data-date="2026-07-30" aria-pressed="false">30<span class="cal-count">2</span></button><button type="button" class="cal-day on" data-date="2026-07-31" aria-pressed="false">31<span class="cal-count">1</span></button></div>
+</div>
+</div>
+      <div class="table-scroll"><table class="works-table">
+  <thead><tr><th>일자</th><th>차량 · 메모</th><th>부위</th><th>조치</th><th>판단 근거</th></tr></thead>
+  <tbody><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>51소****</strong>
+    <input type="text" class="memo" data-memo="glass|2026-07-30|51소****|전면 유리|교체"
+           placeholder="메모" aria-label="51소**** 교체 메모">
+  </td>
+  <td>전면 유리</td>
+  <td><span class="tag main">교체</span></td>
+  <td class="reason-cell">전면(조수석) 원형 손상 - 2.5mm 초과 1개</td>
+</tr><tr data-date="2026-07-30">
+  <td class="mono">07/30</td>
+  <td class="car-cell">
+    <strong>54다****</strong>
+    <input type="text" class="memo" data-memo="glass|2026-07-30|54다****|후면|유리 광택"
+           placeholder="메모" aria-label="54다**** 유리 광택 메모">
+  </td>
+  <td>후면</td>
+  <td><span class="tag alt">유리 광택</span></td>
+  <td class="reason-cell">후면 넓은 오염</td>
+</tr><tr data-date="2026-07-31">
+  <td class="mono">07/31</td>
+  <td class="car-cell">
+    <strong>47누****</strong>
+    <input type="text" class="memo" data-memo="glass|2026-07-31|47누****|선루프|유리 광택"
+           placeholder="메모" aria-label="47누**** 유리 광택 메모">
+  </td>
+  <td>선루프</td>
+  <td><span class="tag alt">유리 광택</span></td>
+  <td class="reason-cell">선루프 넓은 오염</td>
+</tr></tbody></table></div>
+  <p class="empty-hint" hidden>선택한 날짜에는 작업 판단이 없습니다.</p>
+      <p class="note">메모는 이 브라우저에만 저장됩니다. 다른 PC나 다른 사람 화면에는 보이지 않습니다.</p>
+    </div>
+  </details>
+</div>
+  <details class="day">
+  <summary class="day-head">
+    <h3>2026.07.31</h3>
+    <div class="day-facts">
+      <span><b>5</b>대</span>
+      <span>평균 <b>3:04</b></span>
+      <span>최단 <b>1:46</b> · 최장 <b>3:37</b></span>
+      <span>작업 판단 <b>1</b>건</span>
+      <span class="better">전반 3:10 → 후반 3:00
+        (-5%)</span>
+    </div>
+  </summary>
+  <div class="table-scroll"><table class="detail">
+<thead><tr>
+  <th>순번</th><th>완료</th><th>차량</th><th>소요시간</th><th>작업</th><th>고지</th>
+</tr></thead>
+<tbody><tr>
+  <td class="num">1</td>
+  <td class="mono">10:06</td>
+  <td><strong>07라****</strong><span class="sub">현대 LF 쏘나타 (14년~17년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:90.3%;background:var(--hanta)"></span></span>
+    <span class="val">3:16</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">2</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 2건</h4><ul class='notify'><li>[디테일링] 전면(조수석) 유리 스티커</li><li>[유리] 후면 얕은 긁힘 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">2</td>
+  <td class="mono">10:10</td>
+  <td><strong>360마****</strong><span class="sub">현대 아반떼 AD (15년~18년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:84.3%;background:var(--hanta)"></span></span>
+    <span class="val">3:03</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">4</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 4건</h4><ul class='notify'><li>[유리] 전면(운전석) 얕은 긁힘 1개</li><li>[유리] 전면(조수석) 얕은 긁힘 1개</li><li>[유리] 전면(조수석) 점 찍힘 2개</li><li>[유리] 후면 얕은 긁힘 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">3</td>
+  <td class="mono">10:14</td>
+  <td><strong>223버****</strong><span class="sub">현대 쏘나타 (DN8) (19년~23년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:100.0%;background:var(--hanta)"></span></span>
+    <span class="val">3:37</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">2</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 2건</h4><ul class='notify'><li>[유리] 전면(운전석) 점 찍힘 3개</li><li>[유리] 전면(조수석) 점 찍힘 3개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">4</td>
+  <td class="mono">10:17</td>
+  <td><strong>241저****</strong><span class="sub">기아 더 뉴 기아 레이 (22년~현재)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:48.8%;background:var(--hanta)"></span></span>
+    <span class="val">1:46</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">0</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><p class='reason pale'>작업·고지 판단이 없는 차량입니다.</p></div></div></details>
+</td></tr><tr>
+  <td class="num">5</td>
+  <td class="mono">10:21</td>
+  <td><strong>47누****</strong><span class="sub">현대 싼타페 DM (12년~15년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:100.0%;background:var(--hanta)"></span></span>
+    <span class="val">3:37</span>
+  </td>
+  <td><span class="tag alt">유리 광택</span></td>
+  <td class="num">6</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>선루프-유리 광택</strong><ul class='reason'><li>선루프 넓은 오염</li></ul></li></ol></div><div class='block'><h4>고지 항목 6건</h4><ul class='notify'><li>[유리] 전면(운전석) 점 찍힘 1개</li><li>[유리] 전면(조수석) 얕은 긁힘 1개</li><li>[유리] 전면(조수석) 점 찍힘 1개</li><li>[디테일링] 전면(조수석) 유리 스티커</li><li>[디테일링] 후면 유리 스티커</li><li>[유리] 운1열 얕은 긁힘 1개</li></ul></div></div></details>
+</td></tr></tbody>
+</table></div>
+</details><details class="day">
+  <summary class="day-head">
+    <h3>2026.07.30</h3>
+    <div class="day-facts">
+      <span><b>14</b>대</span>
+      <span>평균 <b>8:22</b></span>
+      <span>최단 <b>4:19</b> · 최장 <b>20:26</b></span>
+      <span>작업 판단 <b>2</b>건</span>
+      <span class="better">전반 10:44 → 후반 6:00
+        (-44%)</span>
+    </div>
+  </summary>
+  <div class="table-scroll"><table class="detail">
+<thead><tr>
+  <th>순번</th><th>완료</th><th>차량</th><th>소요시간</th><th>작업</th><th>고지</th>
+</tr></thead>
+<tbody><tr>
+  <td class="num">1</td>
+  <td class="mono">16:48</td>
+  <td><strong>157부****</strong><span class="sub">기아 K5 3세대 (19년~23년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:58.2%;background:var(--hanta)"></span></span>
+    <span class="val">11:54</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">7</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 7건</h4><ul class='notify'><li>[유리] 전면(운전석) 점 찍힘 3개</li><li>[유리] 전면(운전석) 복원 흔적 1개</li><li>[유리] 전면(조수석) 점 찍힘 8개</li><li>[유리] 조1열 점 찍힘 2개</li><li>[유리] 조2열 얕은 긁힘 2개</li><li>[디테일링] 후면 유리 스티커</li><li>[디테일링] 운2열(쪽창) 유리 스티커</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">2</td>
+  <td class="mono">16:56</td>
+  <td><strong>41주****</strong><span class="sub">기아 더 뉴 카렌스 (16년~18년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:33.8%;background:var(--hanta)"></span></span>
+    <span class="val">6:55</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">4</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 4건</h4><ul class='notify'><li>[유리] 전면(운전석) 점 찍힘 3개</li><li>[디테일링] 전면(운전석) 유리 좁은 오염</li><li>[유리] 전면(조수석) 점 찍힘 6개</li><li>[유리] 운3열 점 찍힘 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">3</td>
+  <td class="mono">17:19</td>
+  <td><strong>12구****</strong><span class="sub">기아 프라이드(신형) (05년~11년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:100.0%;background:var(--hanta)"></span></span>
+    <span class="val">20:26</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">9</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 9건</h4><ul class='notify'><li>[유리] 전면(운전석) 점 찍힘 5개</li><li>[유리] 전면(운전석) 와이퍼로 인한 손상</li><li>[유리] 전면(조수석) 얕은 긁힘 1개</li><li>[유리] 전면(조수석) 점 찍힘 4개</li><li>[디테일링] 전면(조수석) 유리 좁은 오염</li><li>[유리] 조2열(쪽창) 얕은 긁힘 1개</li><li>[유리] 후면 얕은 긁힘 1개</li><li>[디테일링] 운2열(쪽창) 유리 스티커</li><li>[유리] 운1열 점 찍힘 2개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">4</td>
+  <td class="mono">17:30</td>
+  <td><strong>51소****</strong><span class="sub">기아 모하비 (07년~16년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:47.0%;background:var(--hanta)"></span></span>
+    <span class="val">9:36</span>
+  </td>
+  <td><span class="tag main">교체</span></td>
+  <td class="num">1</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>전면 유리-교체</strong><ul class='reason'><li>전면(조수석) 원형 손상 - 2.5mm 초과 1개</li></ul></li></ol></div><div class='block'><h4>고지 항목 1건</h4><ul class='notify'><li>[유리] 조2열 얕은 긁힘 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">5</td>
+  <td class="mono">17:38</td>
+  <td><strong>378모****</strong><span class="sub">기아 뉴 모닝 (08년~11년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:34.9%;background:var(--hanta)"></span></span>
+    <span class="val">7:08</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">4</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 4건</h4><ul class='notify'><li>[유리] 전면(운전석) 점 찍힘 1개</li><li>[디테일링] 조2열 유리 좁은 오염</li><li>[디테일링] 후면 유리 스티커</li><li>[디테일링] 운2열(쪽창) 유리 스티커</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">6</td>
+  <td class="mono">17:49</td>
+  <td><strong>42수****</strong><span class="sub">랜드로버 레인지로버 스포츠 2세대 (13년~22년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:49.8%;background:var(--hanta)"></span></span>
+    <span class="val">10:11</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">8</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 8건</h4><ul class='notify'><li>[유리] 전면(조수석) 점 찍힘 3개</li><li>[유리] 조1열 얕은 긁힘 3개</li><li>[유리] 조1열 넓은 긁힘 2개</li><li>[유리] 조2열 얕은 긁힘 1개</li><li>[유리] 조2열 넓은 긁힘 1개</li><li>[유리] 후면 얕은 긁힘 1개</li><li>[유리] 후면 와이퍼로 인한 손상</li><li>[유리] 운1열 얕은 긁힘 4개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">7</td>
+  <td class="mono">17:58</td>
+  <td><strong>24모****</strong><span class="sub">기아 뉴 모닝 (08년~11년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:43.9%;background:var(--hanta)"></span></span>
+    <span class="val">8:58</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">7</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 7건</h4><ul class='notify'><li>[유리] 전면(운전석) 점 찍힘 5개</li><li>[유리] 전면(조수석) 점 찍힘 5개</li><li>[유리] 전면(조수석) 와이퍼로 인한 손상</li><li>[유리] 조1열 얕은 긁힘 1개</li><li>[유리] 후면 와이퍼로 인한 손상</li><li>[디테일링] 운2열(쪽창) 유리 스티커</li><li>[유리] 운1열 얕은 긁힘 2개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">8</td>
+  <td class="mono">18:17</td>
+  <td><strong>228가****</strong><span class="sub">기아 더 뉴 기아 레이 (22년~현재)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:30.6%;background:var(--hanta)"></span></span>
+    <span class="val">6:15</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">3</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 3건</h4><ul class='notify'><li>[유리] 전면(운전석) 점 찍힘 4개</li><li>[유리] 전면(조수석) 점 찍힘 6개</li><li>[유리] 운1열 점 찍힘 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">9</td>
+  <td class="mono">18:28</td>
+  <td><strong>04버****</strong><span class="sub">기아 더 뉴 프라이드 (14년~17년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:50.2%;background:var(--hanta)"></span></span>
+    <span class="val">10:16</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">3</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 3건</h4><ul class='notify'><li>[유리] 전면(운전석) 얕은 긁힘 2개</li><li>[유리] 전면(조수석) 점 찍힘 8개</li><li>[디테일링] 후면 유리 좁은 오염</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">10</td>
+  <td class="mono">18:35</td>
+  <td><strong>11누****</strong><span class="sub">쉐보레(GM대우) 스파크 (11년~15년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:33.6%;background:var(--hanta)"></span></span>
+    <span class="val">6:52</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">8</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 8건</h4><ul class='notify'><li>[유리] 전면(운전석) 얕은 긁힘 2개</li><li>[유리] 전면(운전석) 점 찍힘 3개</li><li>[유리] 전면(조수석) 얕은 긁힘 1개</li><li>[유리] 전면(조수석) 점 찍힘 1개</li><li>[유리] 조1열 얕은 긁힘 1개</li><li>[유리] 조2열 얕은 긁힘 1개</li><li>[디테일링] 운2열 유리 스티커</li><li>[유리] 운1열 얕은 긁힘 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">11</td>
+  <td class="mono">18:41</td>
+  <td><strong>222수****</strong><span class="sub">현대 더 뉴 아반떼 (CN7) (23년~현재)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:21.1%;background:var(--hanta)"></span></span>
+    <span class="val">4:19</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">1</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 1건</h4><ul class='notify'><li>[유리] 전면(운전석) 점 찍힘 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">12</td>
+  <td class="mono">18:47</td>
+  <td><strong>110우****</strong><span class="sub">기아 K5 하이브리드 3세대 (19년~23년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:25.1%;background:var(--hanta)"></span></span>
+    <span class="val">5:08</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">5</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 5건</h4><ul class='notify'><li>[유리] 전면(운전석) 얕은 긁힘 1개</li><li>[유리] 전면(운전석) 점 찍힘 3개</li><li>[유리] 전면(조수석) 점 찍힘 8개</li><li>[디테일링] 후면 유리 스티커</li><li>[유리] 운2열 얕은 긁힘 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">13</td>
+  <td class="mono">18:52</td>
+  <td><strong>54다****</strong><span class="sub">현대 그랜저 IG (16년~19년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:21.9%;background:var(--hanta)"></span></span>
+    <span class="val">4:29</span>
+  </td>
+  <td><span class="tag alt">유리 광택</span></td>
+  <td class="num">4</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>후면-유리 광택</strong><ul class='reason'><li>후면 넓은 오염</li></ul></li></ol></div><div class='block'><h4>고지 항목 4건</h4><ul class='notify'><li>[유리] 전면(운전석) 얕은 긁힘 1개</li><li>[유리] 전면(조수석) 점 찍힘 4개</li><li>[유리] 조1열 얕은 긁힘 1개</li><li>[유리] 운2열 점 찍힘 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">14</td>
+  <td class="mono">19:01</td>
+  <td><strong>46로****</strong><span class="sub">현대 그랜저 IG (16년~19년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:22.8%;background:var(--hanta)"></span></span>
+    <span class="val">4:39</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">3</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 3건</h4><ul class='notify'><li>[유리] 전면(운전석) 얕은 긁힘 1개</li><li>[유리] 전면(운전석) 점 찍힘 2개</li><li>[유리] 전면(조수석) 점 찍힘 5개</li></ul></div></div></details>
+</td></tr></tbody>
+</table></div>
+</details>
+  <div class="card cost-card" data-filterable="cost-glass"
+     data-amounts='{&quot;all&quot;: &quot;전체 기간 · 작업 3건&quot;, &quot;2026-07-30&quot;: &quot;7월 30일 · 작업 2건&quot;, &quot;2026-07-31&quot;: &quot;7월 31일 · 작업 1건&quot;}'>
+  <div class="card-head"><h3>상품화 작업 내역</h3></div>
+  <div class="cost-today">
+    <span class="stat-label">오늘 작업 건수</span>
+    <span class="cost-value">1건</span>
+    <span class="cost-sub">상품화가 필요하다고 판단한 작업 건수입니다</span>
+  </div>
+  <details class="cost-more">
+    <summary>월별 누적 · 일자별 조회 · 건별 내역 보기</summary>
+    <div class="cost-more-body">
+      <div class="cost-months">
+        <h4>월별 누적</h4>
+        <div class="stat-row"><span class="stat-label">2026년 7월</span>
+        <span class="stat-value month-value">3건</span></div>
+      </div>
+      <div class="calendar wide">
+  <div class="cal-head">
+    <button type="button" class="cal-all is-on" data-date="all" aria-pressed="true">전체 기간</button>
+    <span class="cal-hint">날짜를 누르면 그날 작업만 봅니다 · 숫자는 작업 건수</span>
+  </div>
+  <div class="cal-month">
+  <div class="cal-title">2026년 7월</div>
+  <div class="cal-grid"><span class="cal-wd">일</span><span class="cal-wd">월</span><span class="cal-wd">화</span><span class="cal-wd">수</span><span class="cal-wd">목</span><span class="cal-wd">금</span><span class="cal-wd">토</span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-day off">1</span><span class="cal-day off">2</span><span class="cal-day off">3</span><span class="cal-day off">4</span><span class="cal-day off">5</span><span class="cal-day off">6</span><span class="cal-day off">7</span><span class="cal-day off">8</span><span class="cal-day off">9</span><span class="cal-day off">10</span><span class="cal-day off">11</span><span class="cal-day off">12</span><span class="cal-day off">13</span><span class="cal-day off">14</span><span class="cal-day off">15</span><span class="cal-day off">16</span><span class="cal-day off">17</span><span class="cal-day off">18</span><span class="cal-day off">19</span><span class="cal-day off">20</span><span class="cal-day off">21</span><span class="cal-day off">22</span><span class="cal-day off">23</span><span class="cal-day off">24</span><span class="cal-day off">25</span><span class="cal-day off">26</span><span class="cal-day off">27</span><span class="cal-day off">28</span><span class="cal-day off">29</span><button type="button" class="cal-day on" data-date="2026-07-30" aria-pressed="false">30<span class="cal-count">2</span></button><button type="button" class="cal-day on" data-date="2026-07-31" aria-pressed="false">31<span class="cal-count">1</span></button></div>
+</div>
+</div>
+      <p class="sel-amount">전체 기간 · 작업 3건</p>
+      <div class="table-scroll"><table class="cost-table">
+  <thead><tr><th>일자</th><th>차량</th><th>부위</th><th>조치</th></tr></thead>
+  <tbody><tr data-date="2026-07-30">
+  <td class="mono" rowspan="1">07/30</td><td class="car-group" rowspan="1"><strong>51소****</strong><span class="sub">1건</span></td>
+  <td>전면 유리</td>
+  <td><span class="tag main">교체</span></td>
+  
+</tr><tr data-date="2026-07-30">
+  <td class="mono" rowspan="1">07/30</td><td class="car-group" rowspan="1"><strong>54다****</strong><span class="sub">1건</span></td>
+  <td>후면</td>
+  <td><span class="tag alt">유리 광택</span></td>
+  
+</tr><tr data-date="2026-07-31">
+  <td class="mono" rowspan="1">07/31</td><td class="car-group" rowspan="1"><strong>47누****</strong><span class="sub">1건</span></td>
+  <td>선루프</td>
+  <td><span class="tag alt">유리 광택</span></td>
+  
+</tr></tbody></table></div>
+  <p class="empty-hint" hidden>선택한 날짜에는 작업 건이 없습니다.</p>
+      <p class="note">작업에 드는 금액은 사내 자료라 이 공개 페이지에서는 빼고 건수만 보여줍니다. 금액이 필요하시면 사내 리포트를 확인해 주세요.</p>
+    </div>
+  </details>
+</div>
+</section>
+</div>
+
+<script>
+// 막대 그래프 — 날짜 위에 커서를 올리면 그 날짜의 두 진단자 값을 함께 보여준다
+document.querySelectorAll('.chart-wrap').forEach((wrap) => {
+  const id = wrap.dataset.chart;
+  const data = JSON.parse(wrap.dataset.payload);
+  const svg = wrap.querySelector('svg');
+  const hit = wrap.querySelector(`#${id}-hit`);
+  const band = wrap.querySelector(`#${id}-band`);
+  const tip = wrap.querySelector(`#${id}-tip`);
+  const fmt = (s) => s == null ? '–' : `${Math.floor(s / 60)}:${String(Math.round(s) % 60).padStart(2, '0')}`;
+
+  const show = (clientX) => {
+    const box = svg.getBoundingClientRect();
+    const scale = data.width / box.width;
+    const svgX = (clientX - box.left) * scale;
+    const i = Math.max(0, Math.min(data.labels.length - 1, Math.floor((svgX - data.padL) / data.band)));
+    band.setAttribute('x', data.padL + data.band * i);
+    band.classList.add('on');
+    const rows = data.series
+      .filter((s) => s.values[i] != null)
+      .map((s) => `<div class="row"><span class="key" style="background:${s.color}"></span>${s.name} <b>${fmt(s.values[i])}</b></div>`)
+      .join('');
+    if (!rows) { hide(); return; }
+    tip.innerHTML = `<div><b>${data.labels[i]}</b></div>${rows}`;
+    tip.hidden = false;
+  };
+  const hide = () => { band.classList.remove('on'); tip.hidden = true; };
+
+  hit.addEventListener('mousemove', (e) => show(e.clientX));
+  hit.addEventListener('mouseleave', hide);
+  hit.addEventListener('touchstart', (e) => show(e.touches[0].clientX), { passive: true });
+  hit.addEventListener('touchmove', (e) => show(e.touches[0].clientX), { passive: true });
+  hit.addEventListener('touchend', hide);
+});
+
+// 달력 날짜 필터 — 고른 날짜의 행만 남기고, 비용 카드는 그 날짜 금액도 함께 바꾼다
+document.querySelectorAll('[data-filterable]').forEach((card) => {
+  const buttons = card.querySelectorAll('[data-date]');
+  const rows = card.querySelectorAll('tbody tr[data-date]');
+  const emptyHint = card.querySelector('.empty-hint');
+  const amountOut = card.querySelector('.sel-amount');
+  const amounts = card.dataset.amounts ? JSON.parse(card.dataset.amounts) : null;
+
+  const select = (picked) => {
+    buttons.forEach((b) => {
+      const on = b.dataset.date === picked;
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+    let shown = 0;
+    rows.forEach((tr) => {
+      const show = picked === 'all' || tr.dataset.date === picked;
+      tr.hidden = !show;
+      if (show) shown += 1;
+    });
+    if (emptyHint) emptyHint.hidden = shown > 0;
+    if (amountOut && amounts) amountOut.textContent = amounts[picked] || '작업 건 없음';
+  };
+
+  buttons.forEach((b) => b.addEventListener('click', () => select(b.dataset.date)));
+});
+
+// 메모 — 브라우저 저장소에 즉시 보관하고, 다시 열 때 되살린다
+document.querySelectorAll('.memo').forEach((input) => {
+  const key = 'vd-memo:' + input.dataset.memo;
+  const saved = localStorage.getItem(key);
+  if (saved) { input.value = saved; input.classList.add('has-value'); }
+  input.addEventListener('input', () => {
+    if (input.value) localStorage.setItem(key, input.value);
+    else localStorage.removeItem(key);
+    input.classList.toggle('has-value', Boolean(input.value));
+  });
+});
+</script>
