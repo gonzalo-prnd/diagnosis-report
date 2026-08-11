@@ -88,6 +88,10 @@ section { display: flex; flex-direction: column; gap: 16px; }
 
 .chart-wrap { position: relative; }
 .chart { width: 100%; height: auto; display: block; overflow: visible; }
+/* 날짜가 쌓이면 그림을 실제 폭으로 그리고 옆으로 밀어 본다(막대 위 숫자를 지키기 위해) */
+.chart-scroll { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+.chart-scroll .chart { min-width: 520px; }
+.chart-scroll .chart.wide { width: auto; max-width: none; min-width: 0; height: 300px; }
 .grid { stroke: var(--grid); stroke-width: 1; }
 .tick { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
 .cap-label { fill: var(--ink-2); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -299,26 +303,26 @@ ul.reason li { font-size: 13px; }
   <div class="dates">
     <span><span class="k">시작일</span>2026년 7월 30일</span>
     <span><span class="k">기준일</span><span class="as-of">2026년 8월 11일</span></span>
-    <span><span class="k">마지막 진단</span><span class="as-of">08/11 11:40</span></span>
-    <span><span class="k">어드민 항목 반영</span><span class="as-of">08/11 11:30</span></span>
+    <span><span class="k">마지막 진단</span><span class="as-of">08/11 14:13</span></span>
+    <span><span class="k">어드민 항목 반영</span><span class="as-of">08/11 14:32</span></span>
   </div>
 </header>
 
 <div class="stats"><div class="stat-card">
   <div class="stat-head"><span class="dot" style="background:var(--rei)"></span>
     틴팅 진단 · REI</div>
-  <div class="stat-row"><span class="stat-label">평균 소요 시간</span><span class="stat-value">1:11</span></div><div class="stat-row"><span class="stat-label">최대 소요 시간</span><span class="stat-value">2:53</span></div><div class="stat-row"><span class="stat-label">최소 소요 시간</span><span class="stat-value">0:40</span></div>
+  <div class="stat-row"><span class="stat-label">평균 소요 시간</span><span class="stat-value">1:10</span></div><div class="stat-row"><span class="stat-label">최대 소요 시간</span><span class="stat-value">2:53</span></div><div class="stat-row"><span class="stat-label">최소 소요 시간</span><span class="stat-value">0:40</span></div>
   <div class="stat-row count-row">
     <span class="stat-label">진단 차량</span>
-    <span class="stat-value">오늘 27대 · 누적 878대</span>
+    <span class="stat-value">오늘 35대 · 누적 886대</span>
   </div>
 </div><div class="stat-card">
   <div class="stat-head"><span class="dot" style="background:var(--hanta)"></span>
     유리 진단 · HANTA</div>
-  <div class="stat-row"><span class="stat-label">평균 소요 시간</span><span class="stat-value">1:37</span></div><div class="stat-row"><span class="stat-label">최대 소요 시간</span><span class="stat-value">3:55</span></div><div class="stat-row"><span class="stat-label">최소 소요 시간</span><span class="stat-value">0:57</span></div>
+  <div class="stat-row"><span class="stat-label">평균 소요 시간</span><span class="stat-value">1:35</span></div><div class="stat-row"><span class="stat-label">최대 소요 시간</span><span class="stat-value">3:55</span></div><div class="stat-row"><span class="stat-label">최소 소요 시간</span><span class="stat-value">0:57</span></div>
   <div class="stat-row count-row">
     <span class="stat-label">진단 차량</span>
-    <span class="stat-value">오늘 26대 · 누적 877대</span>
+    <span class="stat-value">오늘 35대 · 누적 886대</span>
   </div>
 </div></div>
 
@@ -332,11 +336,11 @@ ul.reason li { font-size: 13px; }
       <h3>날짜별 비교</h3>
       <div class="legend"><span class="legend-item"><span class="swatch" style="background:var(--rei)"></span>REI</span><span class="legend-item"><span class="swatch" style="background:var(--hanta)"></span>HANTA</span><span class="legend-item"><span class="swatch" style="background:var(--lift)"></span>리프트 진단</span></div>
     </div>
-    <div class="chart-wrap" data-chart="daily-mean" data-payload='{&quot;labels&quot;: [&quot;07/30&quot;, &quot;07/31&quot;, &quot;08/03&quot;, &quot;08/04&quot;, &quot;08/05&quot;, &quot;08/06&quot;, &quot;08/07&quot;, &quot;08/10&quot;, &quot;08/11&quot;], &quot;series&quot;: [{&quot;name&quot;: &quot;REI&quot;, &quot;color&quot;: &quot;var(--rei)&quot;, &quot;values&quot;: [443.7142857142857, 145.11111111111111, 100.75, 79.53571428571429, 72.99159663865547, 68.00826446280992, 62.79831932773109, 64.96296296296296, 71.22222222222223]}, {&quot;name&quot;: &quot;HANTA&quot;, &quot;color&quot;: &quot;var(--hanta)&quot;, &quot;values&quot;: [501.85714285714283, 154.63636363636363, 107.23076923076923, 88.75, 80.39495798319328, 73.6694214876033, 66.77310924369748, 65.42962962962963, 97.07692307692308]}, {&quot;name&quot;: &quot;리프트 진단&quot;, &quot;color&quot;: &quot;var(--lift)&quot;, &quot;values&quot;: [546.4193548387096, 580.6666666666666, 569.5727272727273, 460.25925925925924, 495.52941176470586, 538.0, 594.1, 601.8955223880597, 547.9024390243902]}], &quot;padL&quot;: 54, &quot;band&quot;: 105.11111111111111, &quot;width&quot;: 1020, &quot;unit&quot;: &quot;duration&quot;}'><svg viewBox="0 0 1020 300" class="chart" role="img" aria-label="일자별 평균 소요시간 막대 그래프"><line class="grid" x1="54" y1="258.0" x2="1000" y2="258.0"/><text class="tick" x="44" y="262.0" text-anchor="end">0분</text><line class="grid" x1="54" y1="210.8" x2="1000" y2="210.8"/><text class="tick" x="44" y="214.8" text-anchor="end">3분</text><line class="grid" x1="54" y1="163.6" x2="1000" y2="163.6"/><text class="tick" x="44" y="167.6" text-anchor="end">6분</text><line class="grid" x1="54" y1="116.4" x2="1000" y2="116.4"/><text class="tick" x="44" y="120.4" text-anchor="end">9분</text><line class="grid" x1="54" y1="69.2" x2="1000" y2="69.2"/><text class="tick" x="44" y="73.2" text-anchor="end">12분</text><line class="grid" x1="54" y1="22.0" x2="1000" y2="22.0"/><text class="tick" x="44" y="26.0" text-anchor="end">15분</text><rect class="band" id="daily-mean-band" x="0" y="22" width="105.1" height="236"/><text class="tick" x="106.6" y="278" text-anchor="middle">07/30</text><path class="bar" d="M74.0 258.0 V145.6 Q74.0 141.6 78.0 141.6 H90.4 Q94.4 141.6 94.4 145.6 V258.0 Z" style="fill:var(--rei)"/><path class="bar" d="M96.4 258.0 V130.4 Q96.4 126.4 100.4 126.4 H112.8 Q116.8 126.4 116.8 130.4 V258.0 Z" style="fill:var(--hanta)"/><path class="bar" d="M118.8 258.0 V118.7 Q118.8 114.7 122.8 114.7 H135.1 Q139.1 114.7 139.1 118.7 V258.0 Z" style="fill:var(--lift)"/><text class="tick" x="211.7" y="278" text-anchor="middle">07/31</text><path class="bar" d="M179.1 258.0 V223.9 Q179.1 219.9 183.1 219.9 H195.5 Q199.5 219.9 199.5 223.9 V258.0 Z" style="fill:var(--rei)"/><path class="bar" d="M201.5 258.0 V221.5 Q201.5 217.5 205.5 217.5 H217.9 Q221.9 217.5 221.9 221.5 V258.0 Z" style="fill:var(--hanta)"/><path class="bar" d="M223.9 258.0 V109.7 Q223.9 105.7 227.9 105.7 H240.3 Q244.3 105.7 244.3 109.7 V258.0 Z" style="fill:var(--lift)"/><text class="tick" x="316.8" y="278" text-anchor="middle">08/03</text><path class="bar" d="M284.2 258.0 V235.6 Q284.2 231.6 288.2 231.6 H300.6 Q304.6 231.6 304.6 235.6 V258.0 Z" style="fill:var(--rei)"/><path class="bar" d="M306.6 258.0 V233.9 Q306.6 229.9 310.6 229.9 H323.0 Q327.0 229.9 327.0 233.9 V258.0 Z" style="fill:var(--hanta)"/><path class="bar" d="M329.0 258.0 V112.6 Q329.0 108.6 333.0 108.6 H345.4 Q349.4 108.6 349.4 112.6 V258.0 Z" style="fill:var(--lift)"/><text class="tick" x="421.9" y="278" text-anchor="middle">08/04</text><path class="bar" d="M389.3 258.0 V241.1 Q389.3 237.1 393.3 237.1 H405.7 Q409.7 237.1 409.7 241.1 V258.0 Z" style="fill:var(--rei)"/><path class="bar" d="M411.7 258.0 V238.7 Q411.7 234.7 415.7 234.7 H428.1 Q432.1 234.7 432.1 238.7 V258.0 Z" style="fill:var(--hanta)"/><path class="bar" d="M434.1 258.0 V141.3 Q434.1 137.3 438.1 137.3 H450.5 Q454.5 137.3 454.5 141.3 V258.0 Z" style="fill:var(--lift)"/><text class="tick" x="527.0" y="278" text-anchor="middle">08/05</text><path class="bar" d="M494.4 258.0 V242.9 Q494.4 238.9 498.4 238.9 H510.8 Q514.8 238.9 514.8 242.9 V258.0 Z" style="fill:var(--rei)"/><path class="bar" d="M516.8 258.0 V240.9 Q516.8 236.9 520.8 236.9 H533.2 Q537.2 236.9 537.2 240.9 V258.0 Z" style="fill:var(--hanta)"/><path class="bar" d="M539.2 258.0 V132.1 Q539.2 128.1 543.2 128.1 H555.6 Q559.6 128.1 559.6 132.1 V258.0 Z" style="fill:var(--lift)"/><text class="tick" x="632.1" y="278" text-anchor="middle">08/06</text><path class="bar" d="M599.5 258.0 V244.2 Q599.5 240.2 603.5 240.2 H615.9 Q619.9 240.2 619.9 244.2 V258.0 Z" style="fill:var(--rei)"/><path class="bar" d="M621.9 258.0 V242.7 Q621.9 238.7 625.9 238.7 H638.3 Q642.3 238.7 642.3 242.7 V258.0 Z" style="fill:var(--hanta)"/><path class="bar" d="M644.3 258.0 V120.9 Q644.3 116.9 648.3 116.9 H660.7 Q664.7 116.9 664.7 120.9 V258.0 Z" style="fill:var(--lift)"/><text class="tick" x="737.2" y="278" text-anchor="middle">08/07</text><path class="bar" d="M704.6 258.0 V245.5 Q704.6 241.5 708.6 241.5 H721.0 Q725.0 241.5 725.0 245.5 V258.0 Z" style="fill:var(--rei)"/><path class="bar" d="M727.0 258.0 V244.5 Q727.0 240.5 731.0 240.5 H743.4 Q747.4 240.5 747.4 244.5 V258.0 Z" style="fill:var(--hanta)"/><path class="bar" d="M749.4 258.0 V106.2 Q749.4 102.2 753.4 102.2 H765.8 Q769.8 102.2 769.8 106.2 V258.0 Z" style="fill:var(--lift)"/><text class="tick" x="842.3" y="278" text-anchor="middle">08/10</text><path class="bar" d="M809.7 258.0 V245.0 Q809.7 241.0 813.7 241.0 H826.1 Q830.1 241.0 830.1 245.0 V258.0 Z" style="fill:var(--rei)"/><path class="bar" d="M832.1 258.0 V244.8 Q832.1 240.8 836.1 240.8 H848.5 Q852.5 240.8 852.5 244.8 V258.0 Z" style="fill:var(--hanta)"/><path class="bar" d="M854.5 258.0 V104.2 Q854.5 100.2 858.5 100.2 H870.9 Q874.9 100.2 874.9 104.2 V258.0 Z" style="fill:var(--lift)"/><text class="tick" x="947.4" y="278" text-anchor="middle">08/11</text><path class="bar" d="M914.9 258.0 V243.3 Q914.9 239.3 918.9 239.3 H931.2 Q935.2 239.3 935.2 243.3 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="925.1" y="233.3" text-anchor="middle">1:11</text><path class="bar" d="M937.2 258.0 V236.5 Q937.2 232.5 941.2 232.5 H953.6 Q957.6 232.5 957.6 236.5 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="947.4" y="226.5" text-anchor="middle">1:37</text><path class="bar" d="M959.6 258.0 V118.3 Q959.6 114.3 963.6 114.3 H976.0 Q980.0 114.3 980.0 118.3 V258.0 Z" style="fill:var(--lift)"/><text class="cap-label" x="969.8" y="108.3" text-anchor="middle">9:08</text><rect id="daily-mean-hit" x="54" y="22" width="946.0" height="236" fill="transparent"/></svg><div class="tooltip" id="daily-mean-tip" hidden></div></div>
+    <div class="chart-wrap" data-chart="daily-mean" data-payload='{&quot;labels&quot;: [&quot;07/30&quot;, &quot;07/31&quot;, &quot;08/03&quot;, &quot;08/04&quot;, &quot;08/05&quot;, &quot;08/06&quot;, &quot;08/07&quot;, &quot;08/10&quot;, &quot;08/11&quot;], &quot;series&quot;: [{&quot;name&quot;: &quot;REI&quot;, &quot;color&quot;: &quot;var(--rei)&quot;, &quot;values&quot;: [443.7142857142857, 145.11111111111111, 100.75, 79.53571428571429, 72.99159663865547, 68.00826446280992, 62.79831932773109, 64.96296296296296, 70.37142857142857]}, {&quot;name&quot;: &quot;HANTA&quot;, &quot;color&quot;: &quot;var(--hanta)&quot;, &quot;values&quot;: [501.85714285714283, 154.63636363636363, 107.23076923076923, 88.75, 80.39495798319328, 73.6694214876033, 66.77310924369748, 65.42962962962963, 95.2]}, {&quot;name&quot;: &quot;리프트 진단&quot;, &quot;color&quot;: &quot;var(--lift)&quot;, &quot;values&quot;: [546.4193548387096, 580.6666666666666, 569.5727272727273, 460.25925925925924, 495.52941176470586, 538.0, 594.1, 601.8955223880597, 568.231884057971]}], &quot;padL&quot;: 54, &quot;band&quot;: 174.19354838709677, &quot;width&quot;: 1641, &quot;unit&quot;: &quot;duration&quot;}'><div class="chart-scroll" data-scroll-end="1"><svg viewBox="0 0 1641 300" class="chart wide" role="img" style="width:1641px" aria-label="일자별 평균 소요시간 막대 그래프"><line class="grid" x1="54" y1="258.0" x2="1621" y2="258.0"/><text class="tick" x="44" y="262.0" text-anchor="end">0분</text><line class="grid" x1="54" y1="210.8" x2="1621" y2="210.8"/><text class="tick" x="44" y="214.8" text-anchor="end">3분</text><line class="grid" x1="54" y1="163.6" x2="1621" y2="163.6"/><text class="tick" x="44" y="167.6" text-anchor="end">6분</text><line class="grid" x1="54" y1="116.4" x2="1621" y2="116.4"/><text class="tick" x="44" y="120.4" text-anchor="end">9분</text><line class="grid" x1="54" y1="69.2" x2="1621" y2="69.2"/><text class="tick" x="44" y="73.2" text-anchor="end">12분</text><line class="grid" x1="54" y1="22.0" x2="1621" y2="22.0"/><text class="tick" x="44" y="26.0" text-anchor="end">15분</text><rect class="band" id="daily-mean-band" x="0" y="22" width="174.2" height="236"/><text class="tick" x="141.1" y="278" text-anchor="middle">07/30</text><path class="bar" d="M93.1 258.0 V145.6 Q93.1 141.6 97.1 141.6 H113.1 Q117.1 141.6 117.1 145.6 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="105.1" y="135.6" text-anchor="middle">7:24</text><path class="bar" d="M129.1 258.0 V130.4 Q129.1 126.4 133.1 126.4 H149.1 Q153.1 126.4 153.1 130.4 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="141.1" y="120.4" text-anchor="middle">8:22</text><path class="bar" d="M165.1 258.0 V118.7 Q165.1 114.7 169.1 114.7 H185.1 Q189.1 114.7 189.1 118.7 V258.0 Z" style="fill:var(--lift)"/><text class="cap-label" x="177.1" y="108.7" text-anchor="middle">9:06</text><text class="tick" x="315.3" y="278" text-anchor="middle">07/31</text><path class="bar" d="M267.3 258.0 V223.9 Q267.3 219.9 271.3 219.9 H287.3 Q291.3 219.9 291.3 223.9 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="279.3" y="213.9" text-anchor="middle">2:25</text><path class="bar" d="M303.3 258.0 V221.5 Q303.3 217.5 307.3 217.5 H323.3 Q327.3 217.5 327.3 221.5 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="315.3" y="211.5" text-anchor="middle">2:35</text><path class="bar" d="M339.3 258.0 V109.7 Q339.3 105.7 343.3 105.7 H359.3 Q363.3 105.7 363.3 109.7 V258.0 Z" style="fill:var(--lift)"/><text class="cap-label" x="351.3" y="99.7" text-anchor="middle">9:41</text><text class="tick" x="489.5" y="278" text-anchor="middle">08/03</text><path class="bar" d="M441.5 258.0 V235.6 Q441.5 231.6 445.5 231.6 H461.5 Q465.5 231.6 465.5 235.6 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="453.5" y="225.6" text-anchor="middle">1:41</text><path class="bar" d="M477.5 258.0 V233.9 Q477.5 229.9 481.5 229.9 H497.5 Q501.5 229.9 501.5 233.9 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="489.5" y="223.9" text-anchor="middle">1:47</text><path class="bar" d="M513.5 258.0 V112.6 Q513.5 108.6 517.5 108.6 H533.5 Q537.5 108.6 537.5 112.6 V258.0 Z" style="fill:var(--lift)"/><text class="cap-label" x="525.5" y="102.6" text-anchor="middle">9:30</text><text class="tick" x="663.7" y="278" text-anchor="middle">08/04</text><path class="bar" d="M615.7 258.0 V241.1 Q615.7 237.1 619.7 237.1 H635.7 Q639.7 237.1 639.7 241.1 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="627.7" y="231.1" text-anchor="middle">1:20</text><path class="bar" d="M651.7 258.0 V238.7 Q651.7 234.7 655.7 234.7 H671.7 Q675.7 234.7 675.7 238.7 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="663.7" y="228.7" text-anchor="middle">1:29</text><path class="bar" d="M687.7 258.0 V141.3 Q687.7 137.3 691.7 137.3 H707.7 Q711.7 137.3 711.7 141.3 V258.0 Z" style="fill:var(--lift)"/><text class="cap-label" x="699.7" y="131.3" text-anchor="middle">7:40</text><text class="tick" x="837.9" y="278" text-anchor="middle">08/05</text><path class="bar" d="M789.9 258.0 V242.9 Q789.9 238.9 793.9 238.9 H809.9 Q813.9 238.9 813.9 242.9 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="801.9" y="232.9" text-anchor="middle">1:13</text><path class="bar" d="M825.9 258.0 V240.9 Q825.9 236.9 829.9 236.9 H845.9 Q849.9 236.9 849.9 240.9 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="837.9" y="230.9" text-anchor="middle">1:20</text><path class="bar" d="M861.9 258.0 V132.1 Q861.9 128.1 865.9 128.1 H881.9 Q885.9 128.1 885.9 132.1 V258.0 Z" style="fill:var(--lift)"/><text class="cap-label" x="873.9" y="122.1" text-anchor="middle">8:16</text><text class="tick" x="1012.1" y="278" text-anchor="middle">08/06</text><path class="bar" d="M964.1 258.0 V244.2 Q964.1 240.2 968.1 240.2 H984.1 Q988.1 240.2 988.1 244.2 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="976.1" y="234.2" text-anchor="middle">1:08</text><path class="bar" d="M1000.1 258.0 V242.7 Q1000.1 238.7 1004.1 238.7 H1020.1 Q1024.1 238.7 1024.1 242.7 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="1012.1" y="232.7" text-anchor="middle">1:14</text><path class="bar" d="M1036.1 258.0 V120.9 Q1036.1 116.9 1040.1 116.9 H1056.1 Q1060.1 116.9 1060.1 120.9 V258.0 Z" style="fill:var(--lift)"/><text class="cap-label" x="1048.1" y="110.9" text-anchor="middle">8:58</text><text class="tick" x="1186.3" y="278" text-anchor="middle">08/07</text><path class="bar" d="M1138.3 258.0 V245.5 Q1138.3 241.5 1142.3 241.5 H1158.3 Q1162.3 241.5 1162.3 245.5 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="1150.3" y="235.5" text-anchor="middle">1:03</text><path class="bar" d="M1174.3 258.0 V244.5 Q1174.3 240.5 1178.3 240.5 H1194.3 Q1198.3 240.5 1198.3 244.5 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="1186.3" y="234.5" text-anchor="middle">1:07</text><path class="bar" d="M1210.3 258.0 V106.2 Q1210.3 102.2 1214.3 102.2 H1230.3 Q1234.3 102.2 1234.3 106.2 V258.0 Z" style="fill:var(--lift)"/><text class="cap-label" x="1222.3" y="96.2" text-anchor="middle">9:54</text><text class="tick" x="1360.5" y="278" text-anchor="middle">08/10</text><path class="bar" d="M1312.5 258.0 V245.0 Q1312.5 241.0 1316.5 241.0 H1332.5 Q1336.5 241.0 1336.5 245.0 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="1324.5" y="235.0" text-anchor="middle">1:05</text><path class="bar" d="M1348.5 258.0 V244.8 Q1348.5 240.8 1352.5 240.8 H1368.5 Q1372.5 240.8 1372.5 244.8 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="1360.5" y="234.8" text-anchor="middle">1:05</text><path class="bar" d="M1384.5 258.0 V104.2 Q1384.5 100.2 1388.5 100.2 H1404.5 Q1408.5 100.2 1408.5 104.2 V258.0 Z" style="fill:var(--lift)"/><text class="cap-label" x="1396.5" y="94.2" text-anchor="middle">10:02</text><text class="tick" x="1534.6" y="278" text-anchor="middle">08/11</text><path class="bar" d="M1486.6 258.0 V243.5 Q1486.6 239.5 1490.6 239.5 H1506.6 Q1510.6 239.5 1510.6 243.5 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="1498.6" y="233.5" text-anchor="middle">1:10</text><path class="bar" d="M1522.6 258.0 V237.0 Q1522.6 233.0 1526.6 233.0 H1542.6 Q1546.6 233.0 1546.6 237.0 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="1534.6" y="227.0" text-anchor="middle">1:35</text><path class="bar" d="M1558.6 258.0 V113.0 Q1558.6 109.0 1562.6 109.0 H1578.6 Q1582.6 109.0 1582.6 113.0 V258.0 Z" style="fill:var(--lift)"/><text class="cap-label" x="1570.6" y="103.0" text-anchor="middle">9:28</text><rect id="daily-mean-hit" x="54" y="22" width="1567.7" height="236" fill="transparent"/></svg></div><div class="tooltip" id="daily-mean-tip" hidden></div><p class="note chart-hint" hidden>옆으로 밀면 이전 날짜까지 봅니다 · 최근 날짜가 오른쪽 끝입니다</p></div>
     <details class="table-view"><summary>표로 보기</summary>
 <div class="table-scroll"><table class="daily">
 <thead><tr><th>일자</th><th>REI</th><th>HANTA</th><th>리프트 진단</th></tr></thead>
-<tbody><tr><th scope='row' class='mono'>07/30</th><td class='mono'>7:24</td><td class='mono'>8:22</td><td class='mono'>9:06</td></tr><tr><th scope='row' class='mono'>07/31</th><td class='mono'>2:25</td><td class='mono'>2:35</td><td class='mono'>9:41</td></tr><tr><th scope='row' class='mono'>08/03</th><td class='mono'>1:41</td><td class='mono'>1:47</td><td class='mono'>9:30</td></tr><tr><th scope='row' class='mono'>08/04</th><td class='mono'>1:20</td><td class='mono'>1:29</td><td class='mono'>7:40</td></tr><tr><th scope='row' class='mono'>08/05</th><td class='mono'>1:13</td><td class='mono'>1:20</td><td class='mono'>8:16</td></tr><tr><th scope='row' class='mono'>08/06</th><td class='mono'>1:08</td><td class='mono'>1:14</td><td class='mono'>8:58</td></tr><tr><th scope='row' class='mono'>08/07</th><td class='mono'>1:03</td><td class='mono'>1:07</td><td class='mono'>9:54</td></tr><tr><th scope='row' class='mono'>08/10</th><td class='mono'>1:05</td><td class='mono'>1:05</td><td class='mono'>10:02</td></tr><tr><th scope='row' class='mono'>08/11</th><td class='mono'>1:11</td><td class='mono'>1:37</td><td class='mono'>9:08</td></tr></tbody></table></div></details>
+<tbody><tr><th scope='row' class='mono'>07/30</th><td class='mono'>7:24</td><td class='mono'>8:22</td><td class='mono'>9:06</td></tr><tr><th scope='row' class='mono'>07/31</th><td class='mono'>2:25</td><td class='mono'>2:35</td><td class='mono'>9:41</td></tr><tr><th scope='row' class='mono'>08/03</th><td class='mono'>1:41</td><td class='mono'>1:47</td><td class='mono'>9:30</td></tr><tr><th scope='row' class='mono'>08/04</th><td class='mono'>1:20</td><td class='mono'>1:29</td><td class='mono'>7:40</td></tr><tr><th scope='row' class='mono'>08/05</th><td class='mono'>1:13</td><td class='mono'>1:20</td><td class='mono'>8:16</td></tr><tr><th scope='row' class='mono'>08/06</th><td class='mono'>1:08</td><td class='mono'>1:14</td><td class='mono'>8:58</td></tr><tr><th scope='row' class='mono'>08/07</th><td class='mono'>1:03</td><td class='mono'>1:07</td><td class='mono'>9:54</td></tr><tr><th scope='row' class='mono'>08/10</th><td class='mono'>1:05</td><td class='mono'>1:05</td><td class='mono'>10:02</td></tr><tr><th scope='row' class='mono'>08/11</th><td class='mono'>1:10</td><td class='mono'>1:35</td><td class='mono'>9:28</td></tr></tbody></table></div></details>
   </div>
 </section>
 
@@ -359,7 +363,7 @@ ul.reason li { font-size: 13px; }
   <details class="table-view"><summary>일자별 추이 보기 · 최근 14일</summary>
     <div class="table-scroll"><table class="daily">
       <thead><tr><th>일자</th><th class="num">진단 차량</th><th class='num'>틴팅</th><th class='num'>유리 복원</th><th class='num'>유리 교체</th><th class='num'>유리 광택</th></tr></thead>
-      <tbody><tr><th scope='row' class='mono'>07/23</th><td class='num'>152대</td><td class='num'>30.9%</td><td class='num'>0.7%</td><td class='num'>3.3%</td><td class='num'>0.7%</td></tr><tr><th scope='row' class='mono'>07/24</th><td class='num'>135대</td><td class='num'>32.6%</td><td class='num'>0.0%</td><td class='num'>3.5%</td><td class='num'>1.5%</td></tr><tr><th scope='row' class='mono'>07/27</th><td class='num'>128대</td><td class='num'>30.4%</td><td class='num'>0.0%</td><td class='num'>4.3%</td><td class='num'>0.0%</td></tr><tr><th scope='row' class='mono'>07/28</th><td class='num'>188대</td><td class='num'>27.8%</td><td class='num'>1.3%</td><td class='num'>5.1%</td><td class='num'>0.5%</td></tr><tr><th scope='row' class='mono'>07/29</th><td class='num'>104대</td><td class='num'>31.4%</td><td class='num'>1.0%</td><td class='num'>3.8%</td><td class='num'>0.0%</td></tr><tr><th scope='row' class='mono'>07/30</th><td class='num'>124대</td><td class='num'>30.8%</td><td class='num'>0.9%</td><td class='num'>3.4%</td><td class='num'>0.0%</td></tr><tr><th scope='row' class='mono'>07/31</th><td class='num'>99대</td><td class='num'>36.9%</td><td class='num'>3.9%</td><td class='num'>7.8%</td><td class='num'>5.1%</td></tr><tr><th scope='row' class='mono'>08/03</th><td class='num'>110대</td><td class='num'>34.5%</td><td class='num'>3.4%</td><td class='num'>5.9%</td><td class='num'>6.4%</td></tr><tr><th scope='row' class='mono'>08/04</th><td class='num'>135대</td><td class='num'>21.6%</td><td class='num'>2.6%</td><td class='num'>3.4%</td><td class='num'>2.2%</td></tr><tr><th scope='row' class='mono'>08/05</th><td class='num'>119대</td><td class='num'>26.2%</td><td class='num'>4.0%</td><td class='num'>3.2%</td><td class='num'>0.8%</td></tr><tr><th scope='row' class='mono'>08/06</th><td class='num'>123대</td><td class='num'>18.6%</td><td class='num'>0.9%</td><td class='num'>3.5%</td><td class='num'>2.4%</td></tr><tr><th scope='row' class='mono'>08/07</th><td class='num'>110대</td><td class='num'>20.8%</td><td class='num'>6.9%</td><td class='num'>1.0%</td><td class='num'>0.0%</td></tr><tr class='today'><th scope='row' class='mono'>08/10</th><td class='num'>134대</td><td class='num'>26.2%</td><td class='num'>4.0%</td><td class='num'>0.8%</td><td class='num'>1.5%</td></tr><tr><th scope='row' class='mono'>08/11</th><td class='num'>26대</td><td class='num'>–</td><td class='num'>–</td><td class='num'>–</td><td class='num'>0.0%</td></tr></tbody>
+      <tbody><tr><th scope='row' class='mono'>07/23</th><td class='num'>152대</td><td class='num'>30.9%</td><td class='num'>0.7%</td><td class='num'>3.3%</td><td class='num'>0.7%</td></tr><tr><th scope='row' class='mono'>07/24</th><td class='num'>135대</td><td class='num'>32.6%</td><td class='num'>0.0%</td><td class='num'>3.5%</td><td class='num'>1.5%</td></tr><tr><th scope='row' class='mono'>07/27</th><td class='num'>128대</td><td class='num'>30.4%</td><td class='num'>0.0%</td><td class='num'>4.3%</td><td class='num'>0.0%</td></tr><tr><th scope='row' class='mono'>07/28</th><td class='num'>188대</td><td class='num'>27.8%</td><td class='num'>1.3%</td><td class='num'>5.1%</td><td class='num'>0.5%</td></tr><tr><th scope='row' class='mono'>07/29</th><td class='num'>104대</td><td class='num'>31.4%</td><td class='num'>1.0%</td><td class='num'>3.8%</td><td class='num'>0.0%</td></tr><tr><th scope='row' class='mono'>07/30</th><td class='num'>124대</td><td class='num'>30.8%</td><td class='num'>0.9%</td><td class='num'>3.4%</td><td class='num'>0.0%</td></tr><tr><th scope='row' class='mono'>07/31</th><td class='num'>99대</td><td class='num'>36.9%</td><td class='num'>3.9%</td><td class='num'>7.8%</td><td class='num'>5.1%</td></tr><tr><th scope='row' class='mono'>08/03</th><td class='num'>110대</td><td class='num'>34.5%</td><td class='num'>3.4%</td><td class='num'>5.9%</td><td class='num'>6.4%</td></tr><tr><th scope='row' class='mono'>08/04</th><td class='num'>135대</td><td class='num'>21.6%</td><td class='num'>2.6%</td><td class='num'>3.4%</td><td class='num'>2.2%</td></tr><tr><th scope='row' class='mono'>08/05</th><td class='num'>119대</td><td class='num'>26.2%</td><td class='num'>4.0%</td><td class='num'>3.2%</td><td class='num'>0.8%</td></tr><tr><th scope='row' class='mono'>08/06</th><td class='num'>123대</td><td class='num'>18.6%</td><td class='num'>0.9%</td><td class='num'>3.5%</td><td class='num'>2.4%</td></tr><tr><th scope='row' class='mono'>08/07</th><td class='num'>110대</td><td class='num'>20.8%</td><td class='num'>6.9%</td><td class='num'>1.0%</td><td class='num'>0.0%</td></tr><tr class='today'><th scope='row' class='mono'>08/10</th><td class='num'>134대</td><td class='num'>26.2%</td><td class='num'>4.0%</td><td class='num'>0.8%</td><td class='num'>1.5%</td></tr><tr><th scope='row' class='mono'>08/11</th><td class='num'>56대</td><td class='num'>–</td><td class='num'>–</td><td class='num'>–</td><td class='num'>0.0%</td></tr></tbody>
     </table></div>
   </details>
 </div>
@@ -375,14 +379,14 @@ ul.reason li { font-size: 13px; }
     <h3>작업 판단 사유</h3>
     <div class="donut-wrap">
   <svg viewBox="0 0 116 116" class="donut" role="img"
-       aria-label="판단 구성 5739건의 조치별 비율">
+       aria-label="판단 구성 5788건의 조치별 비율">
     <circle cx="58.0" cy="58.0" r="48.50" fill="none"
             stroke="var(--grid)" stroke-width="19"/>
-    <circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-main)" stroke-width="19" stroke-dasharray="9.84 294.89" stroke-dashoffset="-0.00" transform="rotate(-90 58.0 58.0)"><title>새로 시공 223건</title></circle><circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-alt)" stroke-width="19" stroke-dasharray="5.49 299.25" stroke-dashoffset="-11.84" transform="rotate(-90 58.0 58.0)"><title>필름 제거 141건</title></circle><circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-notify)" stroke-width="19" stroke-dasharray="283.41 21.33" stroke-dashoffset="-19.33" transform="rotate(-90 58.0 58.0)"><title>고지 5375건</title></circle>
-    <text x="58.0" y="56.0" class="donut-total" text-anchor="middle">5739</text>
+    <circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-main)" stroke-width="19" stroke-dasharray="9.79 294.94" stroke-dashoffset="-0.00" transform="rotate(-90 58.0 58.0)"><title>새로 시공 224건</title></circle><circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-alt)" stroke-width="19" stroke-dasharray="5.53 299.21" stroke-dashoffset="-11.79" transform="rotate(-90 58.0 58.0)"><title>필름 제거 143건</title></circle><circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-notify)" stroke-width="19" stroke-dasharray="283.41 21.32" stroke-dashoffset="-19.32" transform="rotate(-90 58.0 58.0)"><title>고지 5421건</title></circle>
+    <text x="58.0" y="56.0" class="donut-total" text-anchor="middle">5788</text>
     <text x="58.0" y="72.0" class="donut-cap" text-anchor="middle">건</text>
   </svg>
-  <div class="donut-legend"><div class="donut-row"><span class="swatch" style="background:var(--act-main)"></span><span class="donut-label">새로 시공</span><span class="donut-num">223건</span><span class="donut-pct">4%</span></div><div class="donut-row"><span class="swatch" style="background:var(--act-alt)"></span><span class="donut-label">필름 제거</span><span class="donut-num">141건</span><span class="donut-pct">2%</span></div><div class="donut-row"><span class="swatch" style="background:var(--act-notify)"></span><span class="donut-label">고지</span><span class="donut-num">5375건</span><span class="donut-pct">94%</span></div></div>
+  <div class="donut-legend"><div class="donut-row"><span class="swatch" style="background:var(--act-main)"></span><span class="donut-label">새로 시공</span><span class="donut-num">224건</span><span class="donut-pct">4%</span></div><div class="donut-row"><span class="swatch" style="background:var(--act-alt)"></span><span class="donut-label">필름 제거</span><span class="donut-num">143건</span><span class="donut-pct">2%</span></div><div class="donut-row"><span class="swatch" style="background:var(--act-notify)"></span><span class="donut-label">고지</span><span class="donut-num">5421건</span><span class="donut-pct">94%</span></div></div>
 </div>
   </div>
   <details>
@@ -398,7 +402,7 @@ ul.reason li { font-size: 13px; }
   <div class="cal-grid"><span class="cal-wd">일</span><span class="cal-wd">월</span><span class="cal-wd">화</span><span class="cal-wd">수</span><span class="cal-wd">목</span><span class="cal-wd">금</span><span class="cal-wd">토</span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-day off">1</span><span class="cal-day off">2</span><span class="cal-day off">3</span><span class="cal-day off">4</span><span class="cal-day off">5</span><span class="cal-day off">6</span><span class="cal-day off">7</span><span class="cal-day off">8</span><span class="cal-day off">9</span><span class="cal-day off">10</span><span class="cal-day off">11</span><span class="cal-day off">12</span><span class="cal-day off">13</span><span class="cal-day off">14</span><span class="cal-day off">15</span><span class="cal-day off">16</span><span class="cal-day off">17</span><span class="cal-day off">18</span><span class="cal-day off">19</span><span class="cal-day off">20</span><span class="cal-day off">21</span><span class="cal-day off">22</span><span class="cal-day off">23</span><span class="cal-day off">24</span><span class="cal-day off">25</span><span class="cal-day off">26</span><span class="cal-day off">27</span><span class="cal-day off">28</span><span class="cal-day off">29</span><button type="button" class="cal-day on" data-date="2026-07-30" aria-pressed="false">30<span class="cal-count">21</span></button><button type="button" class="cal-day on" data-date="2026-07-31" aria-pressed="false">31<span class="cal-count">58</span></button></div>
 </div><div class="cal-month">
   <div class="cal-title">2026년 8월</div>
-  <div class="cal-grid"><span class="cal-wd">일</span><span class="cal-wd">월</span><span class="cal-wd">화</span><span class="cal-wd">수</span><span class="cal-wd">목</span><span class="cal-wd">금</span><span class="cal-wd">토</span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-day off">1</span><span class="cal-day off">2</span><button type="button" class="cal-day on" data-date="2026-08-03" aria-pressed="false">3<span class="cal-count">48</span></button><button type="button" class="cal-day on" data-date="2026-08-04" aria-pressed="false">4<span class="cal-count">44</span></button><button type="button" class="cal-day on" data-date="2026-08-05" aria-pressed="false">5<span class="cal-count">47</span></button><button type="button" class="cal-day on" data-date="2026-08-06" aria-pressed="false">6<span class="cal-count">32</span></button><button type="button" class="cal-day on" data-date="2026-08-07" aria-pressed="false">7<span class="cal-count">30</span></button><span class="cal-day off">8</span><span class="cal-day off">9</span><button type="button" class="cal-day on" data-date="2026-08-10" aria-pressed="false">10<span class="cal-count">73</span></button><button type="button" class="cal-day on" data-date="2026-08-11" aria-pressed="false">11<span class="cal-count">11</span></button><span class="cal-day off">12</span><span class="cal-day off">13</span><span class="cal-day off">14</span><span class="cal-day off">15</span><span class="cal-day off">16</span><span class="cal-day off">17</span><span class="cal-day off">18</span><span class="cal-day off">19</span><span class="cal-day off">20</span><span class="cal-day off">21</span><span class="cal-day off">22</span><span class="cal-day off">23</span><span class="cal-day off">24</span><span class="cal-day off">25</span><span class="cal-day off">26</span><span class="cal-day off">27</span><span class="cal-day off">28</span><span class="cal-day off">29</span><span class="cal-day off">30</span><span class="cal-day off">31</span></div>
+  <div class="cal-grid"><span class="cal-wd">일</span><span class="cal-wd">월</span><span class="cal-wd">화</span><span class="cal-wd">수</span><span class="cal-wd">목</span><span class="cal-wd">금</span><span class="cal-wd">토</span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-day off">1</span><span class="cal-day off">2</span><button type="button" class="cal-day on" data-date="2026-08-03" aria-pressed="false">3<span class="cal-count">48</span></button><button type="button" class="cal-day on" data-date="2026-08-04" aria-pressed="false">4<span class="cal-count">44</span></button><button type="button" class="cal-day on" data-date="2026-08-05" aria-pressed="false">5<span class="cal-count">47</span></button><button type="button" class="cal-day on" data-date="2026-08-06" aria-pressed="false">6<span class="cal-count">32</span></button><button type="button" class="cal-day on" data-date="2026-08-07" aria-pressed="false">7<span class="cal-count">30</span></button><span class="cal-day off">8</span><span class="cal-day off">9</span><button type="button" class="cal-day on" data-date="2026-08-10" aria-pressed="false">10<span class="cal-count">73</span></button><button type="button" class="cal-day on" data-date="2026-08-11" aria-pressed="false">11<span class="cal-count">14</span></button><span class="cal-day off">12</span><span class="cal-day off">13</span><span class="cal-day off">14</span><span class="cal-day off">15</span><span class="cal-day off">16</span><span class="cal-day off">17</span><span class="cal-day off">18</span><span class="cal-day off">19</span><span class="cal-day off">20</span><span class="cal-day off">21</span><span class="cal-day off">22</span><span class="cal-day off">23</span><span class="cal-day off">24</span><span class="cal-day off">25</span><span class="cal-day off">26</span><span class="cal-day off">27</span><span class="cal-day off">28</span><span class="cal-day off">29</span><span class="cal-day off">30</span><span class="cal-day off">31</span></div>
 </div>
 </div>
       <div class="table-scroll"><table class="works-table">
@@ -4043,6 +4047,36 @@ ul.reason li { font-size: 13px; }
   <td>후면</td>
   <td><span class="tag main">새로 시공</span></td>
   <td class="reason-cell">후면 면 뜯김 10mm 이상 3개</td>
+</tr><tr data-date="2026-08-11">
+  <td class="mono">08/11</td>
+  <td class="car-cell">
+    <strong>142거****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-08-11|142거****|후면|새로 시공"
+           placeholder="메모" aria-label="142거**** 새로 시공 메모">
+  </td>
+  <td>후면</td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="reason-cell">후면 면 뜯김 10mm 이상 1개</td>
+</tr><tr data-date="2026-08-11">
+  <td class="mono">08/11</td>
+  <td class="car-cell">
+    <strong>22주****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-08-11|22주****|전면 유리|필름 제거"
+           placeholder="메모" aria-label="22주**** 필름 제거 메모">
+  </td>
+  <td>전면 유리</td>
+  <td><span class="tag alt">필름 제거</span></td>
+  <td class="reason-cell">전면(운전석) 면 뜯김 10mm 이상 4개</td>
+</tr><tr data-date="2026-08-11">
+  <td class="mono">08/11</td>
+  <td class="car-cell">
+    <strong>08수****</strong>
+    <input type="text" class="memo" data-memo="tinting|2026-08-11|08수****|후면|필름 제거"
+           placeholder="메모" aria-label="08수**** 필름 제거 메모">
+  </td>
+  <td>후면</td>
+  <td><span class="tag alt">필름 제거</span></td>
+  <td class="reason-cell">후면 본드, 하드코트 손상</td>
 </tr></tbody></table></div>
   <p class="empty-hint" hidden>선택한 날짜에는 작업 판단이 없습니다.</p>
       <p class="note">메모는 이 브라우저에만 저장됩니다. 다른 PC나 다른 사람 화면에는 보이지 않습니다.</p>
@@ -4053,8 +4087,8 @@ ul.reason li { font-size: 13px; }
   <div class="card-head"><h3>대당 평균 생성 아이템 수</h3></div>
   <div class="rate-today">
     <span class="stat-label">오늘 대당 평균</span>
-    <span class="rate-value">0.41개</span>
-    <span class="rate-sub">아이템 11건 / 진단 27대 · 틴팅 11건</span>
+    <span class="rate-value">0.40개</span>
+    <span class="rate-sub">아이템 14건 / 진단 35대 · 틴팅 14건</span>
   </div>
   <div class="rate-base">
     <span class="stat-label">리프트 챕터의 평균 생성 아이템 수</span>
@@ -4062,12 +4096,12 @@ ul.reason li { font-size: 13px; }
     <span class="rate-sub">2026년 1~7월 · 틴팅 12,709건
       / 리프트 진단 17,398대</span>
   </div>
-  <div class="chart-wrap" data-chart="item-rate-tinting" data-payload='{&quot;labels&quot;: [&quot;07/30&quot;, &quot;07/31&quot;, &quot;08/03&quot;, &quot;08/04&quot;, &quot;08/05&quot;, &quot;08/06&quot;, &quot;08/07&quot;, &quot;08/10&quot;, &quot;08/11&quot;], &quot;series&quot;: [{&quot;name&quot;: &quot;대당 평균&quot;, &quot;color&quot;: &quot;var(--rei)&quot;, &quot;values&quot;: [0.9285714285714286, 0.43434343434343436, 0.40384615384615385, 0.3357142857142857, 0.3865546218487395, 0.2809917355371901, 0.2184873949579832, 0.5333333333333333, 0.4074074074074074]}], &quot;padL&quot;: 54, &quot;band&quot;: 76.22222222222223, &quot;width&quot;: 760, &quot;unit&quot;: &quot;count&quot;}'><svg viewBox="0 0 760 300" class="chart" role="img" aria-label="일자별 대당 평균 아이템 수 막대 그래프"><line class="grid" x1="54" y1="258.0" x2="740" y2="258.0"/><text class="tick" x="44" y="262.0" text-anchor="end">0개</text><line class="grid" x1="54" y1="210.8" x2="740" y2="210.8"/><text class="tick" x="44" y="214.8" text-anchor="end">0.2개</text><line class="grid" x1="54" y1="163.6" x2="740" y2="163.6"/><text class="tick" x="44" y="167.6" text-anchor="end">0.4개</text><line class="grid" x1="54" y1="116.4" x2="740" y2="116.4"/><text class="tick" x="44" y="120.4" text-anchor="end">0.6개</text><line class="grid" x1="54" y1="69.2" x2="740" y2="69.2"/><text class="tick" x="44" y="73.2" text-anchor="end">0.8개</text><line class="grid" x1="54" y1="22.0" x2="740" y2="22.0"/><text class="tick" x="44" y="26.0" text-anchor="end">1개</text><rect class="band" id="item-rate-tinting-band" x="0" y="22" width="76.2" height="236"/><text class="tick" x="92.1" y="278" text-anchor="middle">07/30</text><path class="bar" d="M80.1 258.0 V42.9 Q80.1 38.9 84.1 38.9 H100.1 Q104.1 38.9 104.1 42.9 V258.0 Z" style="fill:var(--rei)"/><text class="tick" x="168.3" y="278" text-anchor="middle">07/31</text><path class="bar" d="M156.3 258.0 V159.5 Q156.3 155.5 160.3 155.5 H176.3 Q180.3 155.5 180.3 159.5 V258.0 Z" style="fill:var(--rei)"/><text class="tick" x="244.6" y="278" text-anchor="middle">08/03</text><path class="bar" d="M232.6 258.0 V166.7 Q232.6 162.7 236.6 162.7 H252.6 Q256.6 162.7 256.6 166.7 V258.0 Z" style="fill:var(--rei)"/><text class="tick" x="320.8" y="278" text-anchor="middle">08/04</text><path class="bar" d="M308.8 258.0 V182.8 Q308.8 178.8 312.8 178.8 H328.8 Q332.8 178.8 332.8 182.8 V258.0 Z" style="fill:var(--rei)"/><text class="tick" x="397.0" y="278" text-anchor="middle">08/05</text><path class="bar" d="M385.0 258.0 V170.8 Q385.0 166.8 389.0 166.8 H405.0 Q409.0 166.8 409.0 170.8 V258.0 Z" style="fill:var(--rei)"/><text class="tick" x="473.2" y="278" text-anchor="middle">08/06</text><path class="bar" d="M461.2 258.0 V195.7 Q461.2 191.7 465.2 191.7 H481.2 Q485.2 191.7 485.2 195.7 V258.0 Z" style="fill:var(--rei)"/><text class="tick" x="549.4" y="278" text-anchor="middle">08/07</text><path class="bar" d="M537.4 258.0 V210.4 Q537.4 206.4 541.4 206.4 H557.4 Q561.4 206.4 561.4 210.4 V258.0 Z" style="fill:var(--rei)"/><text class="tick" x="625.7" y="278" text-anchor="middle">08/10</text><path class="bar" d="M613.7 258.0 V136.1 Q613.7 132.1 617.7 132.1 H633.7 Q637.7 132.1 637.7 136.1 V258.0 Z" style="fill:var(--rei)"/><text class="tick" x="701.9" y="278" text-anchor="middle">08/11</text><path class="bar" d="M689.9 258.0 V165.9 Q689.9 161.9 693.9 161.9 H709.9 Q713.9 161.9 713.9 165.9 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="701.9" y="155.9" text-anchor="middle">0.41</text><rect id="item-rate-tinting-hit" x="54" y="22" width="686.0" height="236" fill="transparent"/></svg><div class="tooltip" id="item-rate-tinting-tip" hidden></div></div>
-  <p class="note cal-total">전체 기간 진단 878대 · 생성 아이템 334건
+  <div class="chart-wrap" data-chart="item-rate-tinting" data-payload='{&quot;labels&quot;: [&quot;07/30&quot;, &quot;07/31&quot;, &quot;08/03&quot;, &quot;08/04&quot;, &quot;08/05&quot;, &quot;08/06&quot;, &quot;08/07&quot;, &quot;08/10&quot;, &quot;08/11&quot;], &quot;series&quot;: [{&quot;name&quot;: &quot;대당 평균&quot;, &quot;color&quot;: &quot;var(--rei)&quot;, &quot;values&quot;: [0.9285714285714286, 0.43434343434343436, 0.40384615384615385, 0.3357142857142857, 0.3865546218487395, 0.2809917355371901, 0.226890756302521, 0.5333333333333333, 0.4]}], &quot;padL&quot;: 54, &quot;band&quot;: 76.22222222222223, &quot;width&quot;: 760, &quot;unit&quot;: &quot;count&quot;}'><div class="chart-scroll" data-scroll-end="1"><svg viewBox="0 0 760 300" class="chart" role="img" aria-label="일자별 대당 평균 아이템 수 막대 그래프"><line class="grid" x1="54" y1="258.0" x2="740" y2="258.0"/><text class="tick" x="44" y="262.0" text-anchor="end">0개</text><line class="grid" x1="54" y1="210.8" x2="740" y2="210.8"/><text class="tick" x="44" y="214.8" text-anchor="end">0.2개</text><line class="grid" x1="54" y1="163.6" x2="740" y2="163.6"/><text class="tick" x="44" y="167.6" text-anchor="end">0.4개</text><line class="grid" x1="54" y1="116.4" x2="740" y2="116.4"/><text class="tick" x="44" y="120.4" text-anchor="end">0.6개</text><line class="grid" x1="54" y1="69.2" x2="740" y2="69.2"/><text class="tick" x="44" y="73.2" text-anchor="end">0.8개</text><line class="grid" x1="54" y1="22.0" x2="740" y2="22.0"/><text class="tick" x="44" y="26.0" text-anchor="end">1개</text><rect class="band" id="item-rate-tinting-band" x="0" y="22" width="76.2" height="236"/><text class="tick" x="92.1" y="278" text-anchor="middle">07/30</text><path class="bar" d="M80.1 258.0 V42.9 Q80.1 38.9 84.1 38.9 H100.1 Q104.1 38.9 104.1 42.9 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="92.1" y="32.9" text-anchor="middle">0.93</text><text class="tick" x="168.3" y="278" text-anchor="middle">07/31</text><path class="bar" d="M156.3 258.0 V159.5 Q156.3 155.5 160.3 155.5 H176.3 Q180.3 155.5 180.3 159.5 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="168.3" y="149.5" text-anchor="middle">0.43</text><text class="tick" x="244.6" y="278" text-anchor="middle">08/03</text><path class="bar" d="M232.6 258.0 V166.7 Q232.6 162.7 236.6 162.7 H252.6 Q256.6 162.7 256.6 166.7 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="244.6" y="156.7" text-anchor="middle">0.40</text><text class="tick" x="320.8" y="278" text-anchor="middle">08/04</text><path class="bar" d="M308.8 258.0 V182.8 Q308.8 178.8 312.8 178.8 H328.8 Q332.8 178.8 332.8 182.8 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="320.8" y="172.8" text-anchor="middle">0.34</text><text class="tick" x="397.0" y="278" text-anchor="middle">08/05</text><path class="bar" d="M385.0 258.0 V170.8 Q385.0 166.8 389.0 166.8 H405.0 Q409.0 166.8 409.0 170.8 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="397.0" y="160.8" text-anchor="middle">0.39</text><text class="tick" x="473.2" y="278" text-anchor="middle">08/06</text><path class="bar" d="M461.2 258.0 V195.7 Q461.2 191.7 465.2 191.7 H481.2 Q485.2 191.7 485.2 195.7 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="473.2" y="185.7" text-anchor="middle">0.28</text><text class="tick" x="549.4" y="278" text-anchor="middle">08/07</text><path class="bar" d="M537.4 258.0 V208.5 Q537.4 204.5 541.4 204.5 H557.4 Q561.4 204.5 561.4 208.5 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="549.4" y="198.5" text-anchor="middle">0.23</text><text class="tick" x="625.7" y="278" text-anchor="middle">08/10</text><path class="bar" d="M613.7 258.0 V136.1 Q613.7 132.1 617.7 132.1 H633.7 Q637.7 132.1 637.7 136.1 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="625.7" y="126.1" text-anchor="middle">0.53</text><text class="tick" x="701.9" y="278" text-anchor="middle">08/11</text><path class="bar" d="M689.9 258.0 V167.6 Q689.9 163.6 693.9 163.6 H709.9 Q713.9 163.6 713.9 167.6 V258.0 Z" style="fill:var(--rei)"/><text class="cap-label" x="701.9" y="157.6" text-anchor="middle">0.40</text><rect id="item-rate-tinting-hit" x="54" y="22" width="686.0" height="236" fill="transparent"/></svg></div><div class="tooltip" id="item-rate-tinting-tip" hidden></div><p class="note chart-hint" hidden>옆으로 밀면 이전 날짜까지 봅니다 · 최근 날짜가 오른쪽 끝입니다</p></div>
+  <p class="note cal-total">전체 기간 진단 886대 · 생성 아이템 338건
     · 대당 평균 0.38개</p>
 </div>
   <div class="day-cal" style="--pick-b: var(--rei)"
-     data-days='{&quot;days&quot;: {&quot;2026-07-30&quot;: {&quot;cars&quot;: 14, &quot;mean&quot;: 443.7142857142857, &quot;items&quot;: 13, &quot;rate&quot;: 0.9285714285714286, &quot;by&quot;: {&quot;틴팅&quot;: 13}}, &quot;2026-07-31&quot;: {&quot;cars&quot;: 99, &quot;mean&quot;: 145.11111111111111, &quot;items&quot;: 43, &quot;rate&quot;: 0.43434343434343436, &quot;by&quot;: {&quot;틴팅&quot;: 43}}, &quot;2026-08-03&quot;: {&quot;cars&quot;: 104, &quot;mean&quot;: 100.75, &quot;items&quot;: 42, &quot;rate&quot;: 0.40384615384615385, &quot;by&quot;: {&quot;틴팅&quot;: 42}}, &quot;2026-08-04&quot;: {&quot;cars&quot;: 140, &quot;mean&quot;: 79.53571428571429, &quot;items&quot;: 47, &quot;rate&quot;: 0.3357142857142857, &quot;by&quot;: {&quot;틴팅&quot;: 47}}, &quot;2026-08-05&quot;: {&quot;cars&quot;: 119, &quot;mean&quot;: 72.99159663865547, &quot;items&quot;: 46, &quot;rate&quot;: 0.3865546218487395, &quot;by&quot;: {&quot;틴팅&quot;: 46}}, &quot;2026-08-06&quot;: {&quot;cars&quot;: 121, &quot;mean&quot;: 68.00826446280992, &quot;items&quot;: 34, &quot;rate&quot;: 0.2809917355371901, &quot;by&quot;: {&quot;틴팅&quot;: 34}}, &quot;2026-08-07&quot;: {&quot;cars&quot;: 119, &quot;mean&quot;: 62.79831932773109, &quot;items&quot;: 26, &quot;rate&quot;: 0.2184873949579832, &quot;by&quot;: {&quot;틴팅&quot;: 26}}, &quot;2026-08-10&quot;: {&quot;cars&quot;: 135, &quot;mean&quot;: 64.96296296296296, &quot;items&quot;: 72, &quot;rate&quot;: 0.5333333333333333, &quot;by&quot;: {&quot;틴팅&quot;: 72}}, &quot;2026-08-11&quot;: {&quot;cars&quot;: 27, &quot;mean&quot;: 71.22222222222223, &quot;items&quot;: 11, &quot;rate&quot;: 0.4074074074074074, &quot;by&quot;: {&quot;틴팅&quot;: 11}}}, &quot;names&quot;: []}' data-pick="2026-08-11">
+     data-days='{&quot;days&quot;: {&quot;2026-07-30&quot;: {&quot;cars&quot;: 14, &quot;mean&quot;: 443.7142857142857, &quot;items&quot;: 13, &quot;rate&quot;: 0.9285714285714286, &quot;by&quot;: {&quot;틴팅&quot;: 13}}, &quot;2026-07-31&quot;: {&quot;cars&quot;: 99, &quot;mean&quot;: 145.11111111111111, &quot;items&quot;: 43, &quot;rate&quot;: 0.43434343434343436, &quot;by&quot;: {&quot;틴팅&quot;: 43}}, &quot;2026-08-03&quot;: {&quot;cars&quot;: 104, &quot;mean&quot;: 100.75, &quot;items&quot;: 42, &quot;rate&quot;: 0.40384615384615385, &quot;by&quot;: {&quot;틴팅&quot;: 42}}, &quot;2026-08-04&quot;: {&quot;cars&quot;: 140, &quot;mean&quot;: 79.53571428571429, &quot;items&quot;: 47, &quot;rate&quot;: 0.3357142857142857, &quot;by&quot;: {&quot;틴팅&quot;: 47}}, &quot;2026-08-05&quot;: {&quot;cars&quot;: 119, &quot;mean&quot;: 72.99159663865547, &quot;items&quot;: 46, &quot;rate&quot;: 0.3865546218487395, &quot;by&quot;: {&quot;틴팅&quot;: 46}}, &quot;2026-08-06&quot;: {&quot;cars&quot;: 121, &quot;mean&quot;: 68.00826446280992, &quot;items&quot;: 34, &quot;rate&quot;: 0.2809917355371901, &quot;by&quot;: {&quot;틴팅&quot;: 34}}, &quot;2026-08-07&quot;: {&quot;cars&quot;: 119, &quot;mean&quot;: 62.79831932773109, &quot;items&quot;: 27, &quot;rate&quot;: 0.226890756302521, &quot;by&quot;: {&quot;틴팅&quot;: 27}}, &quot;2026-08-10&quot;: {&quot;cars&quot;: 135, &quot;mean&quot;: 64.96296296296296, &quot;items&quot;: 72, &quot;rate&quot;: 0.5333333333333333, &quot;by&quot;: {&quot;틴팅&quot;: 72}}, &quot;2026-08-11&quot;: {&quot;cars&quot;: 35, &quot;mean&quot;: 70.37142857142857, &quot;items&quot;: 14, &quot;rate&quot;: 0.4, &quot;by&quot;: {&quot;틴팅&quot;: 14}}}, &quot;names&quot;: []}' data-pick="2026-08-11">
   <div class="card">
     <div class="card-head"><h3>일자별 기록</h3></div>
     <div class="calendar">
@@ -4080,7 +4114,7 @@ ul.reason li { font-size: 13px; }
   <div class="cal-grid"><span class="cal-wd">일</span><span class="cal-wd">월</span><span class="cal-wd">화</span><span class="cal-wd">수</span><span class="cal-wd">목</span><span class="cal-wd">금</span><span class="cal-wd">토</span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-day off">1</span><span class="cal-day off">2</span><span class="cal-day off">3</span><span class="cal-day off">4</span><span class="cal-day off">5</span><span class="cal-day off">6</span><span class="cal-day off">7</span><span class="cal-day off">8</span><span class="cal-day off">9</span><span class="cal-day off">10</span><span class="cal-day off">11</span><span class="cal-day off">12</span><span class="cal-day off">13</span><span class="cal-day off">14</span><span class="cal-day off">15</span><span class="cal-day off">16</span><span class="cal-day off">17</span><span class="cal-day off">18</span><span class="cal-day off">19</span><span class="cal-day off">20</span><span class="cal-day off">21</span><span class="cal-day off">22</span><span class="cal-day off">23</span><span class="cal-day off">24</span><span class="cal-day off">25</span><span class="cal-day off">26</span><span class="cal-day off">27</span><span class="cal-day off">28</span><span class="cal-day off">29</span><button type="button" class="cal-day on" data-date="2026-07-30" aria-pressed="false">30<span class="cal-count">14</span></button><button type="button" class="cal-day on" data-date="2026-07-31" aria-pressed="false">31<span class="cal-count">99</span></button></div>
 </div><div class="cal-month">
   <div class="cal-title">2026년 8월</div>
-  <div class="cal-grid"><span class="cal-wd">일</span><span class="cal-wd">월</span><span class="cal-wd">화</span><span class="cal-wd">수</span><span class="cal-wd">목</span><span class="cal-wd">금</span><span class="cal-wd">토</span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-day off">1</span><span class="cal-day off">2</span><button type="button" class="cal-day on" data-date="2026-08-03" aria-pressed="false">3<span class="cal-count">104</span></button><button type="button" class="cal-day on" data-date="2026-08-04" aria-pressed="false">4<span class="cal-count">140</span></button><button type="button" class="cal-day on" data-date="2026-08-05" aria-pressed="false">5<span class="cal-count">119</span></button><button type="button" class="cal-day on" data-date="2026-08-06" aria-pressed="false">6<span class="cal-count">121</span></button><button type="button" class="cal-day on" data-date="2026-08-07" aria-pressed="false">7<span class="cal-count">119</span></button><span class="cal-day off">8</span><span class="cal-day off">9</span><button type="button" class="cal-day on" data-date="2026-08-10" aria-pressed="false">10<span class="cal-count">135</span></button><button type="button" class="cal-day on" data-date="2026-08-11" aria-pressed="false">11<span class="cal-count">27</span></button><span class="cal-day off">12</span><span class="cal-day off">13</span><span class="cal-day off">14</span><span class="cal-day off">15</span><span class="cal-day off">16</span><span class="cal-day off">17</span><span class="cal-day off">18</span><span class="cal-day off">19</span><span class="cal-day off">20</span><span class="cal-day off">21</span><span class="cal-day off">22</span><span class="cal-day off">23</span><span class="cal-day off">24</span><span class="cal-day off">25</span><span class="cal-day off">26</span><span class="cal-day off">27</span><span class="cal-day off">28</span><span class="cal-day off">29</span><span class="cal-day off">30</span><span class="cal-day off">31</span></div>
+  <div class="cal-grid"><span class="cal-wd">일</span><span class="cal-wd">월</span><span class="cal-wd">화</span><span class="cal-wd">수</span><span class="cal-wd">목</span><span class="cal-wd">금</span><span class="cal-wd">토</span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-day off">1</span><span class="cal-day off">2</span><button type="button" class="cal-day on" data-date="2026-08-03" aria-pressed="false">3<span class="cal-count">104</span></button><button type="button" class="cal-day on" data-date="2026-08-04" aria-pressed="false">4<span class="cal-count">140</span></button><button type="button" class="cal-day on" data-date="2026-08-05" aria-pressed="false">5<span class="cal-count">119</span></button><button type="button" class="cal-day on" data-date="2026-08-06" aria-pressed="false">6<span class="cal-count">121</span></button><button type="button" class="cal-day on" data-date="2026-08-07" aria-pressed="false">7<span class="cal-count">119</span></button><span class="cal-day off">8</span><span class="cal-day off">9</span><button type="button" class="cal-day on" data-date="2026-08-10" aria-pressed="false">10<span class="cal-count">135</span></button><button type="button" class="cal-day on" data-date="2026-08-11" aria-pressed="false">11<span class="cal-count">35</span></button><span class="cal-day off">12</span><span class="cal-day off">13</span><span class="cal-day off">14</span><span class="cal-day off">15</span><span class="cal-day off">16</span><span class="cal-day off">17</span><span class="cal-day off">18</span><span class="cal-day off">19</span><span class="cal-day off">20</span><span class="cal-day off">21</span><span class="cal-day off">22</span><span class="cal-day off">23</span><span class="cal-day off">24</span><span class="cal-day off">25</span><span class="cal-day off">26</span><span class="cal-day off">27</span><span class="cal-day off">28</span><span class="cal-day off">29</span><span class="cal-day off">30</span><span class="cal-day off">31</span></div>
 </div>
 </div>
     <div class="tooltip cal-tip" hidden></div>
@@ -11962,7 +11996,7 @@ ul.reason li { font-size: 13px; }
       <span><b>119</b>대</span>
       <span>평균 <b>1:03</b></span>
       <span>최단 <b>0:13</b> · 최장 <b>1:44</b></span>
-      <span>생성 아이템 <b>26</b>건</span>
+      <span>생성 아이템 <b>27</b>건</span>
       <span class="better">전반 1:05 → 후반 1:01
         (-6%)</span>
     </div>
@@ -15297,12 +15331,12 @@ ul.reason li { font-size: 13px; }
   <summary class="day-head">
     <h3>2026.08.11</h3>
     <div class="day-facts">
-      <span><b>27</b>대</span>
-      <span>평균 <b>1:11</b></span>
+      <span><b>35</b>대</span>
+      <span>평균 <b>1:10</b></span>
       <span>최단 <b>0:40</b> · 최장 <b>2:53</b></span>
-      <span>생성 아이템 <b>11</b>건</span>
-      <span class="worse">전반 1:09 → 후반 1:13
-        (+6%)</span>
+      <span>생성 아이템 <b>14</b>건</span>
+      <span class="better">전반 1:19 → 후반 1:02
+        (-21%)</span>
     </div>
   </summary>
   <div class="table-scroll"><table class="detail">
@@ -15660,17 +15694,121 @@ ul.reason li { font-size: 13px; }
 </tr>
 <tr class="detail-row"><td colspan="6">
   <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 1건</h4><ul class='notify'><li>[틴팅] 전면(운전석) 스티커(자국 포함)</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">28</td>
+  <td class="mono">12:04</td>
+  <td><strong>55마****</strong><span class="sub">벤츠 SL클래스 (R231) (14년~23년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:28.3%;background:var(--rei)"></span></span>
+    <span class="val">0:49</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">4</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 4건</h4><ul class='notify'><li>[틴팅] 운1열(앞면) 얕은 실 긁힘, 점 찍힘 5개</li><li>[틴팅] 조1열(앞면) 얕은 실 긁힘, 점 찍힘 5개</li><li>[틴팅] 운1열(후면) 얕은 실 긁힘, 점 찍힘 6개</li><li>[틴팅] 조1열(후면) 얕은 실 긁힘, 점 찍힘 5개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">29</td>
+  <td class="mono">12:06</td>
+  <td><strong>10모****</strong><span class="sub">기아 EV9 (23년~현재)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:40.5%;background:var(--rei)"></span></span>
+    <span class="val">1:10</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">2</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 2건</h4><ul class='notify'><li>[틴팅] 전면(운전석) 스티커(자국 포함)</li><li>[틴팅] 조1열(후면) 얕은 실 긁힘, 점 찍힘 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">30</td>
+  <td class="mono">12:08</td>
+  <td><strong>142거****</strong><span class="sub">기아 더 뉴 카니발 하이브리드(KA4) (23년~현재)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:49.1%;background:var(--rei)"></span></span>
+    <span class="val">1:25</span>
+  </td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="num">6</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>후면-새로 시공</strong><ul class='reason'><li>후면 면 뜯김 10mm 이상 1개</li></ul></li></ol></div><div class='block'><h4>고지 항목 6건</h4><ul class='notify'><li>[틴팅] 전면(운전석) 스티커(자국 포함)</li><li>[틴팅] 운1열(앞면) 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 조1열(후면) 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 조2열 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 선루프 가벼운 손상(선루프)</li><li>[틴팅] 2열 선루프 가벼운 손상(선루프)</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">31</td>
+  <td class="mono">12:10</td>
+  <td><strong>22주****</strong><span class="sub">쉐보레(GM대우) 더 넥스트 스파크 (15년~18년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:43.4%;background:var(--rei)"></span></span>
+    <span class="val">1:15</span>
+  </td>
+  <td><span class="tag alt">필름 제거</span></td>
+  <td class="num">9</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>전면 유리-필름 제거</strong><ul class='reason'><li>전면(운전석) 면 뜯김 10mm 이상 4개</li></ul></li></ol></div><div class='block'><h4>고지 항목 9건</h4><ul class='notify'><li>[틴팅] 운1열(앞면) 점 찍힘 1개</li><li>[틴팅] 운1열(앞면) 얕은 실 긁힘, 점 찍힘 3개</li><li>[틴팅] 조1열(앞면) 점 찍힘 1개</li><li>[틴팅] 운1열(후면) 점 찍힘 6개</li><li>[틴팅] 운1열(후면) 얕은 실 긁힘, 점 찍힘 2개</li><li>[틴팅] 조1열(후면) 점 찍힘 1개</li><li>[틴팅] 조1열(후면) 얕은 실 긁힘, 점 찍힘 2개</li><li>[틴팅] 조1열(후면) 면 뜯김 5mm 미만 1개</li><li>[틴팅] 운2열 얕은 실 긁힘, 점 찍힘 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">32</td>
+  <td class="mono">12:13</td>
+  <td><strong>841서****</strong><span class="sub">KG모빌리티(쌍용) 더 뉴 렉스턴 스포츠 칸 (21년~현재)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:32.9%;background:var(--rei)"></span></span>
+    <span class="val">0:57</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">7</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 7건</h4><ul class='notify'><li>[틴팅] 전면(조수석) 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 운1열(앞면) 점 찍힘 1개</li><li>[틴팅] 운1열(앞면) 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 운1열(후면) 점 찍힘 1개</li><li>[틴팅] 운1열(후면) 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 운2열 얕은 실 긁힘, 점 찍힘 2개</li><li>[틴팅] 조2열 얕은 실 긁힘, 점 찍힘 3개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">33</td>
+  <td class="mono">12:15</td>
+  <td><strong>264마****</strong><span class="sub">미니 쿠퍼 3세대(F56) (14년~24년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:38.7%;background:var(--rei)"></span></span>
+    <span class="val">1:07</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">9</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 9건</h4><ul class='notify'><li>[틴팅] 전면(운전석) 스티커(자국 포함)</li><li>[틴팅] 전면(조수석) 스티커(자국 포함)</li><li>[틴팅] 운1열(앞면) 점 찍힘 1개</li><li>[틴팅] 운1열(앞면) 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 조1열(후면) 얕은 실 긁힘, 점 찍힘 2개</li><li>[틴팅] 운2열 점 찍힘 1개</li><li>[틴팅] 운2열 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 후면 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 2열 선루프 가벼운 손상(선루프)</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">34</td>
+  <td class="mono">12:17</td>
+  <td><strong>08수****</strong><span class="sub">기아 K5 2세대 (15년~18년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:39.9%;background:var(--rei)"></span></span>
+    <span class="val">1:09</span>
+  </td>
+  <td><span class="tag alt">필름 제거</span></td>
+  <td class="num">7</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>작업 판단 사유</h4><ol class='works'><li><strong>후면-필름 제거</strong><ul class='reason'><li>후면 본드, 하드코트 손상</li></ul></li></ol></div><div class='block'><h4>고지 항목 7건</h4><ul class='notify'><li>[틴팅] 전면(조수석) 스티커(자국 포함)</li><li>[틴팅] 운1열(앞면) 면 뜯김 5mm 미만 1개</li><li>[틴팅] 운1열(후면) 점 찍힘 1개</li><li>[틴팅] 운1열(후면) 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 조1열(후면) 점 찍힘 4개</li><li>[틴팅] 운2열 얕은 실 긁힘, 점 찍힘 1개</li><li>[틴팅] 조2열 얕은 실 긁힘, 점 찍힘 2개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">35</td>
+  <td class="mono">12:19</td>
+  <td><strong>55버****</strong><span class="sub">테슬라 모델 Y 주니퍼 (25년~현재)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:39.3%;background:var(--rei)"></span></span>
+    <span class="val">1:08</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">2</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 2건</h4><ul class='notify'><li>[틴팅] 운1열(앞면) 얕은 실 긁힘, 점 찍힘 2개</li><li>[틴팅] 조2열 얕은 실 긁힘, 점 찍힘 1개</li></ul></div></div></details>
 </td></tr></tbody>
 </table></div>
 </details></div>
 </div>
   <div class="card cost-card" data-filterable="cost-tinting"
-     data-amounts='{&quot;all&quot;: &quot;전체 기간 · 7,144,000 ~ 9,764,000원 · 334건&quot;, &quot;2026-07-30&quot;: &quot;7월 30일 · 260,000 ~ 360,000원 · 13건&quot;, &quot;2026-07-31&quot;: &quot;7월 31일 · 890,000 ~ 1,250,000원 · 43건&quot;, &quot;2026-08-03&quot;: &quot;8월 3일 · 1,045,000 ~ 1,505,000원 · 42건&quot;, &quot;2026-08-04&quot;: &quot;8월 4일 · 960,000 ~ 1,400,000원 · 47건&quot;, &quot;2026-08-05&quot;: &quot;8월 5일 · 1,035,000 ~ 1,415,000원 · 46건&quot;, &quot;2026-08-06&quot;: &quot;8월 6일 · 770,000 ~ 990,000원 · 34건&quot;, &quot;2026-08-07&quot;: &quot;8월 7일 · 535,000 ~ 735,000원 · 26건&quot;, &quot;2026-08-10&quot;: &quot;8월 10일 · 1,359,000 ~ 1,739,000원 · 72건&quot;, &quot;2026-08-11&quot;: &quot;8월 11일 · 290,000 ~ 370,000원 · 11건&quot;}'>
+     data-amounts='{&quot;all&quot;: &quot;전체 기간 · 7,239,000 ~ 9,879,000원 · 338건&quot;, &quot;2026-07-30&quot;: &quot;7월 30일 · 260,000 ~ 360,000원 · 13건&quot;, &quot;2026-07-31&quot;: &quot;7월 31일 · 890,000 ~ 1,250,000원 · 43건&quot;, &quot;2026-08-03&quot;: &quot;8월 3일 · 1,045,000 ~ 1,505,000원 · 42건&quot;, &quot;2026-08-04&quot;: &quot;8월 4일 · 960,000 ~ 1,400,000원 · 47건&quot;, &quot;2026-08-05&quot;: &quot;8월 5일 · 1,035,000 ~ 1,415,000원 · 46건&quot;, &quot;2026-08-06&quot;: &quot;8월 6일 · 770,000 ~ 990,000원 · 34건&quot;, &quot;2026-08-07&quot;: &quot;8월 7일 · 555,000 ~ 755,000원 · 27건&quot;, &quot;2026-08-10&quot;: &quot;8월 10일 · 1,359,000 ~ 1,739,000원 · 72건&quot;, &quot;2026-08-11&quot;: &quot;8월 11일 · 365,000 ~ 465,000원 · 14건&quot;}'>
   <div class="card-head"><h3>상품화 비용 추정</h3><span class="ref-only">참고용</span></div>
   <div class="cost-today">
     <span class="stat-label">오늘 발생 금액</span>
-    <span class="cost-value">290,000 ~ 370,000원</span>
-    <span class="cost-sub">11건 · 전부 일반 필름이면 290,000원, 전부 반사 필름이면 370,000원</span>
+    <span class="cost-value">365,000 ~ 465,000원</span>
+    <span class="cost-sub">14건 · 전부 일반 필름이면 365,000원, 전부 반사 필름이면 465,000원</span>
   </div>
   <details class="cost-more">
     <summary>월별 누적 · 일자별 조회 · 건별 내역 보기</summary>
@@ -15680,8 +15818,8 @@ ul.reason li { font-size: 13px; }
         <div class="stat-row"><span class="stat-label">2026년 7월</span>
         <span class="stat-value month-value">1,150,000 ~ 1,610,000원
         <span class="month-count">56건</span></span></div><div class="stat-row"><span class="stat-label">2026년 8월</span>
-        <span class="stat-value month-value">5,994,000 ~ 8,154,000원
-        <span class="month-count">278건</span></span></div>
+        <span class="stat-value month-value">6,089,000 ~ 8,269,000원
+        <span class="month-count">282건</span></span></div>
       </div>
       <div class="calendar wide">
   <div class="cal-head">
@@ -15693,10 +15831,10 @@ ul.reason li { font-size: 13px; }
   <div class="cal-grid"><span class="cal-wd">일</span><span class="cal-wd">월</span><span class="cal-wd">화</span><span class="cal-wd">수</span><span class="cal-wd">목</span><span class="cal-wd">금</span><span class="cal-wd">토</span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-day off">1</span><span class="cal-day off">2</span><span class="cal-day off">3</span><span class="cal-day off">4</span><span class="cal-day off">5</span><span class="cal-day off">6</span><span class="cal-day off">7</span><span class="cal-day off">8</span><span class="cal-day off">9</span><span class="cal-day off">10</span><span class="cal-day off">11</span><span class="cal-day off">12</span><span class="cal-day off">13</span><span class="cal-day off">14</span><span class="cal-day off">15</span><span class="cal-day off">16</span><span class="cal-day off">17</span><span class="cal-day off">18</span><span class="cal-day off">19</span><span class="cal-day off">20</span><span class="cal-day off">21</span><span class="cal-day off">22</span><span class="cal-day off">23</span><span class="cal-day off">24</span><span class="cal-day off">25</span><span class="cal-day off">26</span><span class="cal-day off">27</span><span class="cal-day off">28</span><span class="cal-day off">29</span><button type="button" class="cal-day on" data-date="2026-07-30" aria-pressed="false">30<span class="cal-count">26~36</span></button><button type="button" class="cal-day on" data-date="2026-07-31" aria-pressed="false">31<span class="cal-count">89~125</span></button></div>
 </div><div class="cal-month">
   <div class="cal-title">2026년 8월</div>
-  <div class="cal-grid"><span class="cal-wd">일</span><span class="cal-wd">월</span><span class="cal-wd">화</span><span class="cal-wd">수</span><span class="cal-wd">목</span><span class="cal-wd">금</span><span class="cal-wd">토</span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-day off">1</span><span class="cal-day off">2</span><button type="button" class="cal-day on" data-date="2026-08-03" aria-pressed="false">3<span class="cal-count">104~150</span></button><button type="button" class="cal-day on" data-date="2026-08-04" aria-pressed="false">4<span class="cal-count">96~140</span></button><button type="button" class="cal-day on" data-date="2026-08-05" aria-pressed="false">5<span class="cal-count">104~142</span></button><button type="button" class="cal-day on" data-date="2026-08-06" aria-pressed="false">6<span class="cal-count">77~99</span></button><button type="button" class="cal-day on" data-date="2026-08-07" aria-pressed="false">7<span class="cal-count">54~74</span></button><span class="cal-day off">8</span><span class="cal-day off">9</span><button type="button" class="cal-day on" data-date="2026-08-10" aria-pressed="false">10<span class="cal-count">136~174</span></button><button type="button" class="cal-day on" data-date="2026-08-11" aria-pressed="false">11<span class="cal-count">29~37</span></button><span class="cal-day off">12</span><span class="cal-day off">13</span><span class="cal-day off">14</span><span class="cal-day off">15</span><span class="cal-day off">16</span><span class="cal-day off">17</span><span class="cal-day off">18</span><span class="cal-day off">19</span><span class="cal-day off">20</span><span class="cal-day off">21</span><span class="cal-day off">22</span><span class="cal-day off">23</span><span class="cal-day off">24</span><span class="cal-day off">25</span><span class="cal-day off">26</span><span class="cal-day off">27</span><span class="cal-day off">28</span><span class="cal-day off">29</span><span class="cal-day off">30</span><span class="cal-day off">31</span></div>
+  <div class="cal-grid"><span class="cal-wd">일</span><span class="cal-wd">월</span><span class="cal-wd">화</span><span class="cal-wd">수</span><span class="cal-wd">목</span><span class="cal-wd">금</span><span class="cal-wd">토</span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-day off">1</span><span class="cal-day off">2</span><button type="button" class="cal-day on" data-date="2026-08-03" aria-pressed="false">3<span class="cal-count">104~150</span></button><button type="button" class="cal-day on" data-date="2026-08-04" aria-pressed="false">4<span class="cal-count">96~140</span></button><button type="button" class="cal-day on" data-date="2026-08-05" aria-pressed="false">5<span class="cal-count">104~142</span></button><button type="button" class="cal-day on" data-date="2026-08-06" aria-pressed="false">6<span class="cal-count">77~99</span></button><button type="button" class="cal-day on" data-date="2026-08-07" aria-pressed="false">7<span class="cal-count">56~76</span></button><span class="cal-day off">8</span><span class="cal-day off">9</span><button type="button" class="cal-day on" data-date="2026-08-10" aria-pressed="false">10<span class="cal-count">136~174</span></button><button type="button" class="cal-day on" data-date="2026-08-11" aria-pressed="false">11<span class="cal-count">36~46</span></button><span class="cal-day off">12</span><span class="cal-day off">13</span><span class="cal-day off">14</span><span class="cal-day off">15</span><span class="cal-day off">16</span><span class="cal-day off">17</span><span class="cal-day off">18</span><span class="cal-day off">19</span><span class="cal-day off">20</span><span class="cal-day off">21</span><span class="cal-day off">22</span><span class="cal-day off">23</span><span class="cal-day off">24</span><span class="cal-day off">25</span><span class="cal-day off">26</span><span class="cal-day off">27</span><span class="cal-day off">28</span><span class="cal-day off">29</span><span class="cal-day off">30</span><span class="cal-day off">31</span></div>
 </div>
 </div>
-      <p class="sel-amount">전체 기간 · 7,144,000 ~ 9,764,000원 · 334건</p>
+      <p class="sel-amount">전체 기간 · 7,239,000 ~ 9,879,000원 · 338건</p>
       <div class="table-scroll"><table class="cost-table">
   <thead><tr><th>일자</th><th>차량</th><th>어드민 항목</th><th>조치</th><th class="num">추정 단가</th></tr></thead>
   <tbody><tr data-date="2026-07-30">
@@ -16875,6 +17013,11 @@ ul.reason li { font-size: 13px; }
   <td><span class="tag alt">제거</span></td>
   <td class="num won">20,000원</td>
 </tr><tr data-date="2026-08-07">
+  <td class="mono" rowspan="1">08/07</td><td class="car-group" rowspan="1"><strong>45루****</strong><span class="sub">1건 · 20,000원</span></td>
+  <td>후면 유리 블박 제거 후 틴팅 재시공 필요<span class="sub">단가표 후면</span></td>
+  <td><span class="tag alt">제거</span></td>
+  <td class="num won">20,000원</td>
+</tr><tr data-date="2026-08-07">
   <td class="mono" rowspan="1">08/07</td><td class="car-group" rowspan="1"><strong>43다****</strong><span class="sub">1건 · 35,000 ~ 55,000원</span></td>
   <td>후면-새로 시공<span class="sub">단가표 후면</span></td>
   <td><span class="tag main">새로 시공</span></td>
@@ -17369,6 +17512,21 @@ ul.reason li { font-size: 13px; }
   <td>후면-새로 시공<span class="sub">단가표 후면</span></td>
   <td><span class="tag main">새로 시공</span></td>
   <td class="num won">35,000 ~ 55,000원</td>
+</tr><tr data-date="2026-08-11">
+  <td class="mono" rowspan="1">08/11</td><td class="car-group" rowspan="1"><strong>142거****</strong><span class="sub">1건 · 35,000 ~ 55,000원</span></td>
+  <td>후면-새로 시공<span class="sub">단가표 후면</span></td>
+  <td><span class="tag main">새로 시공</span></td>
+  <td class="num won">35,000 ~ 55,000원</td>
+</tr><tr data-date="2026-08-11">
+  <td class="mono" rowspan="1">08/11</td><td class="car-group" rowspan="1"><strong>22주****</strong><span class="sub">1건 · 20,000원</span></td>
+  <td>전면 유리-필름 제거<span class="sub">단가표 전면</span></td>
+  <td><span class="tag alt">제거</span></td>
+  <td class="num won">20,000원</td>
+</tr><tr data-date="2026-08-11">
+  <td class="mono" rowspan="1">08/11</td><td class="car-group" rowspan="1"><strong>08수****</strong><span class="sub">1건 · 20,000원</span></td>
+  <td>후면-필름 제거<span class="sub">단가표 후면</span></td>
+  <td><span class="tag alt">제거</span></td>
+  <td class="num won">20,000원</td>
 </tr></tbody></table></div>
   <p class="empty-hint" hidden>선택한 날짜에는 상품화 항목이 없습니다.</p>
       <p class="note"><b>여기 금액은 단순 참고용입니다.</b> 실제 청구액이 아니라 단가표를 곱해 어림한 값입니다. 단가는 사내 단가표 기준입니다. 대상은 <b>어드민 상품화 칸반에 남은 항목</b>으로, 대당 평균 생성 아이템 수와 같습니다. 어드민 항목에는 필름 종류가 남지 않아, 새로 시공은 <b>일반 필름(최소) ~ 반사 필름(최대)</b> 범위로 적었습니다. 필름 제거와 유리 교체는 종류가 갈리지 않아 단일 금액입니다. 유리 복원(광택)은 단가표에 범위로 적혀 있어 그 범위를 그대로 썼습니다. '전, 측, 후면 모두-필름 제거'처럼 통째로 걷어내는 항목은 전면·후면·1열 좌우·2열 좌우 <b>여섯 면의 제거 단가를 더해 100,000원</b>으로 봅니다(쪽창·3열이 낀 차도 같은 값으로 둡니다). 항목 내용에서 단가표 위치를 찾지 못한 건(선루프 등)은 미정으로 두고 합계에서 뺐습니다.</p>
@@ -17385,14 +17543,14 @@ ul.reason li { font-size: 13px; }
     <h3>작업 판단 사유</h3>
     <div class="donut-wrap">
   <svg viewBox="0 0 116 116" class="donut" role="img"
-       aria-label="판단 구성 3513건의 조치별 비율">
+       aria-label="판단 구성 3544건의 조치별 비율">
     <circle cx="58.0" cy="58.0" r="48.50" fill="none"
             stroke="var(--grid)" stroke-width="19"/>
-    <circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-main)" stroke-width="19" stroke-dasharray="0.50 304.23" stroke-dashoffset="-0.00" transform="rotate(-90 58.0 58.0)"><title>교체 28건</title></circle><circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-main)" stroke-width="19" stroke-dasharray="0.50 304.23" stroke-dashoffset="-2.43" transform="rotate(-90 58.0 58.0)"><title>틴팅 4건</title></circle><circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-alt)" stroke-width="19" stroke-dasharray="1.82 302.92" stroke-dashoffset="-2.78" transform="rotate(-90 58.0 58.0)"><title>유리 광택 44건</title></circle><circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-alt)" stroke-width="19" stroke-dasharray="0.50 304.23" stroke-dashoffset="-6.59" transform="rotate(-90 58.0 58.0)"><title>복원 25건</title></circle><circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-notify)" stroke-width="19" stroke-dasharray="293.97 10.76" stroke-dashoffset="-8.76" transform="rotate(-90 58.0 58.0)"><title>고지 3412건</title></circle>
-    <text x="58.0" y="56.0" class="donut-total" text-anchor="middle">3513</text>
+    <circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-main)" stroke-width="19" stroke-dasharray="0.50 304.23" stroke-dashoffset="-0.00" transform="rotate(-90 58.0 58.0)"><title>교체 28건</title></circle><circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-main)" stroke-width="19" stroke-dasharray="0.50 304.23" stroke-dashoffset="-2.41" transform="rotate(-90 58.0 58.0)"><title>틴팅 4건</title></circle><circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-alt)" stroke-width="19" stroke-dasharray="1.78 302.95" stroke-dashoffset="-2.75" transform="rotate(-90 58.0 58.0)"><title>유리 광택 44건</title></circle><circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-alt)" stroke-width="19" stroke-dasharray="0.50 304.23" stroke-dashoffset="-6.53" transform="rotate(-90 58.0 58.0)"><title>복원 25건</title></circle><circle cx="58.0" cy="58.0" r="48.50" fill="none" stroke="var(--act-notify)" stroke-width="19" stroke-dasharray="294.05 10.68" stroke-dashoffset="-8.68" transform="rotate(-90 58.0 58.0)"><title>고지 3443건</title></circle>
+    <text x="58.0" y="56.0" class="donut-total" text-anchor="middle">3544</text>
     <text x="58.0" y="72.0" class="donut-cap" text-anchor="middle">건</text>
   </svg>
-  <div class="donut-legend"><div class="donut-row"><span class="swatch" style="background:var(--act-main)"></span><span class="donut-label">교체</span><span class="donut-num">28건</span><span class="donut-pct">1%</span></div><div class="donut-row"><span class="swatch" style="background:var(--act-main)"></span><span class="donut-label">틴팅</span><span class="donut-num">4건</span><span class="donut-pct">0%</span></div><div class="donut-row"><span class="swatch" style="background:var(--act-alt)"></span><span class="donut-label">유리 광택</span><span class="donut-num">44건</span><span class="donut-pct">1%</span></div><div class="donut-row"><span class="swatch" style="background:var(--act-alt)"></span><span class="donut-label">복원</span><span class="donut-num">25건</span><span class="donut-pct">1%</span></div><div class="donut-row"><span class="swatch" style="background:var(--act-notify)"></span><span class="donut-label">고지</span><span class="donut-num">3412건</span><span class="donut-pct">97%</span></div></div>
+  <div class="donut-legend"><div class="donut-row"><span class="swatch" style="background:var(--act-main)"></span><span class="donut-label">교체</span><span class="donut-num">28건</span><span class="donut-pct">1%</span></div><div class="donut-row"><span class="swatch" style="background:var(--act-main)"></span><span class="donut-label">틴팅</span><span class="donut-num">4건</span><span class="donut-pct">0%</span></div><div class="donut-row"><span class="swatch" style="background:var(--act-alt)"></span><span class="donut-label">유리 광택</span><span class="donut-num">44건</span><span class="donut-pct">1%</span></div><div class="donut-row"><span class="swatch" style="background:var(--act-alt)"></span><span class="donut-label">복원</span><span class="donut-num">25건</span><span class="donut-pct">1%</span></div><div class="donut-row"><span class="swatch" style="background:var(--act-notify)"></span><span class="donut-label">고지</span><span class="donut-num">3443건</span><span class="donut-pct">97%</span></div></div>
 </div>
   </div>
   <details>
@@ -18433,8 +18591,8 @@ ul.reason li { font-size: 13px; }
   <div class="card-head"><h3>대당 평균 생성 아이템 수</h3></div>
   <div class="rate-today">
     <span class="stat-label">오늘 대당 평균</span>
-    <span class="rate-value">0.08개</span>
-    <span class="rate-sub">아이템 2건 / 진단 26대 · 유리 복원 1건 · 유리 교체 1건</span>
+    <span class="rate-value">0.06개</span>
+    <span class="rate-sub">아이템 2건 / 진단 35대 · 유리 복원 1건 · 유리 교체 1건</span>
   </div>
   <div class="rate-base">
     <span class="stat-label">리프트 챕터의 평균 생성 아이템 수</span>
@@ -18442,12 +18600,12 @@ ul.reason li { font-size: 13px; }
     <span class="rate-sub">2026년 1~7월 · 유리 복원 315건 · 유리 교체 920건
       / 리프트 진단 17,398대</span>
   </div>
-  <div class="chart-wrap" data-chart="item-rate-glass" data-payload='{&quot;labels&quot;: [&quot;07/30&quot;, &quot;07/31&quot;, &quot;08/03&quot;, &quot;08/04&quot;, &quot;08/05&quot;, &quot;08/06&quot;, &quot;08/07&quot;, &quot;08/10&quot;, &quot;08/11&quot;], &quot;series&quot;: [{&quot;name&quot;: &quot;대당 평균&quot;, &quot;color&quot;: &quot;var(--hanta)&quot;, &quot;values&quot;: [0.07142857142857142, 0.09090909090909091, 0.028846153846153848, 0.07857142857142857, 0.06722689075630252, 0.05785123966942149, 0.06722689075630252, 0.05925925925925926, 0.07692307692307693]}], &quot;padL&quot;: 54, &quot;band&quot;: 76.22222222222223, &quot;width&quot;: 760, &quot;unit&quot;: &quot;count&quot;}'><svg viewBox="0 0 760 300" class="chart" role="img" aria-label="일자별 대당 평균 아이템 수 막대 그래프"><line class="grid" x1="54" y1="258.0" x2="740" y2="258.0"/><text class="tick" x="44" y="262.0" text-anchor="end">0개</text><line class="grid" x1="54" y1="210.8" x2="740" y2="210.8"/><text class="tick" x="44" y="214.8" text-anchor="end">0.05개</text><line class="grid" x1="54" y1="163.6" x2="740" y2="163.6"/><text class="tick" x="44" y="167.6" text-anchor="end">0.1개</text><line class="grid" x1="54" y1="116.4" x2="740" y2="116.4"/><text class="tick" x="44" y="120.4" text-anchor="end">0.15개</text><line class="grid" x1="54" y1="69.2" x2="740" y2="69.2"/><text class="tick" x="44" y="73.2" text-anchor="end">0.2개</text><line class="grid" x1="54" y1="22.0" x2="740" y2="22.0"/><text class="tick" x="44" y="26.0" text-anchor="end">0.25개</text><rect class="band" id="item-rate-glass-band" x="0" y="22" width="76.2" height="236"/><text class="tick" x="92.1" y="278" text-anchor="middle">07/30</text><path class="bar" d="M80.1 258.0 V194.6 Q80.1 190.6 84.1 190.6 H100.1 Q104.1 190.6 104.1 194.6 V258.0 Z" style="fill:var(--hanta)"/><text class="tick" x="168.3" y="278" text-anchor="middle">07/31</text><path class="bar" d="M156.3 258.0 V176.2 Q156.3 172.2 160.3 172.2 H176.3 Q180.3 172.2 180.3 176.2 V258.0 Z" style="fill:var(--hanta)"/><text class="tick" x="244.6" y="278" text-anchor="middle">08/03</text><path class="bar" d="M232.6 258.0 V234.8 Q232.6 230.8 236.6 230.8 H252.6 Q256.6 230.8 256.6 234.8 V258.0 Z" style="fill:var(--hanta)"/><text class="tick" x="320.8" y="278" text-anchor="middle">08/04</text><path class="bar" d="M308.8 258.0 V187.8 Q308.8 183.8 312.8 183.8 H328.8 Q332.8 183.8 332.8 187.8 V258.0 Z" style="fill:var(--hanta)"/><text class="tick" x="397.0" y="278" text-anchor="middle">08/05</text><path class="bar" d="M385.0 258.0 V198.5 Q385.0 194.5 389.0 194.5 H405.0 Q409.0 194.5 409.0 198.5 V258.0 Z" style="fill:var(--hanta)"/><text class="tick" x="473.2" y="278" text-anchor="middle">08/06</text><path class="bar" d="M461.2 258.0 V207.4 Q461.2 203.4 465.2 203.4 H481.2 Q485.2 203.4 485.2 207.4 V258.0 Z" style="fill:var(--hanta)"/><text class="tick" x="549.4" y="278" text-anchor="middle">08/07</text><path class="bar" d="M537.4 258.0 V198.5 Q537.4 194.5 541.4 194.5 H557.4 Q561.4 194.5 561.4 198.5 V258.0 Z" style="fill:var(--hanta)"/><text class="tick" x="625.7" y="278" text-anchor="middle">08/10</text><path class="bar" d="M613.7 258.0 V206.1 Q613.7 202.1 617.7 202.1 H633.7 Q637.7 202.1 637.7 206.1 V258.0 Z" style="fill:var(--hanta)"/><text class="tick" x="701.9" y="278" text-anchor="middle">08/11</text><path class="bar" d="M689.9 258.0 V189.4 Q689.9 185.4 693.9 185.4 H709.9 Q713.9 185.4 713.9 189.4 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="701.9" y="179.4" text-anchor="middle">0.08</text><rect id="item-rate-glass-hit" x="54" y="22" width="686.0" height="236" fill="transparent"/></svg><div class="tooltip" id="item-rate-glass-tip" hidden></div></div>
-  <p class="note cal-total">전체 기간 진단 877대 · 생성 아이템 57건
+  <div class="chart-wrap" data-chart="item-rate-glass" data-payload='{&quot;labels&quot;: [&quot;07/30&quot;, &quot;07/31&quot;, &quot;08/03&quot;, &quot;08/04&quot;, &quot;08/05&quot;, &quot;08/06&quot;, &quot;08/07&quot;, &quot;08/10&quot;, &quot;08/11&quot;], &quot;series&quot;: [{&quot;name&quot;: &quot;대당 평균&quot;, &quot;color&quot;: &quot;var(--hanta)&quot;, &quot;values&quot;: [0.07142857142857142, 0.09090909090909091, 0.028846153846153848, 0.07857142857142857, 0.06722689075630252, 0.05785123966942149, 0.06722689075630252, 0.05925925925925926, 0.05714285714285714]}], &quot;padL&quot;: 54, &quot;band&quot;: 76.22222222222223, &quot;width&quot;: 760, &quot;unit&quot;: &quot;count&quot;}'><div class="chart-scroll" data-scroll-end="1"><svg viewBox="0 0 760 300" class="chart" role="img" aria-label="일자별 대당 평균 아이템 수 막대 그래프"><line class="grid" x1="54" y1="258.0" x2="740" y2="258.0"/><text class="tick" x="44" y="262.0" text-anchor="end">0개</text><line class="grid" x1="54" y1="210.8" x2="740" y2="210.8"/><text class="tick" x="44" y="214.8" text-anchor="end">0.05개</text><line class="grid" x1="54" y1="163.6" x2="740" y2="163.6"/><text class="tick" x="44" y="167.6" text-anchor="end">0.1개</text><line class="grid" x1="54" y1="116.4" x2="740" y2="116.4"/><text class="tick" x="44" y="120.4" text-anchor="end">0.15개</text><line class="grid" x1="54" y1="69.2" x2="740" y2="69.2"/><text class="tick" x="44" y="73.2" text-anchor="end">0.2개</text><line class="grid" x1="54" y1="22.0" x2="740" y2="22.0"/><text class="tick" x="44" y="26.0" text-anchor="end">0.25개</text><rect class="band" id="item-rate-glass-band" x="0" y="22" width="76.2" height="236"/><text class="tick" x="92.1" y="278" text-anchor="middle">07/30</text><path class="bar" d="M80.1 258.0 V194.6 Q80.1 190.6 84.1 190.6 H100.1 Q104.1 190.6 104.1 194.6 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="92.1" y="184.6" text-anchor="middle">0.07</text><text class="tick" x="168.3" y="278" text-anchor="middle">07/31</text><path class="bar" d="M156.3 258.0 V176.2 Q156.3 172.2 160.3 172.2 H176.3 Q180.3 172.2 180.3 176.2 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="168.3" y="166.2" text-anchor="middle">0.09</text><text class="tick" x="244.6" y="278" text-anchor="middle">08/03</text><path class="bar" d="M232.6 258.0 V234.8 Q232.6 230.8 236.6 230.8 H252.6 Q256.6 230.8 256.6 234.8 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="244.6" y="224.8" text-anchor="middle">0.03</text><text class="tick" x="320.8" y="278" text-anchor="middle">08/04</text><path class="bar" d="M308.8 258.0 V187.8 Q308.8 183.8 312.8 183.8 H328.8 Q332.8 183.8 332.8 187.8 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="320.8" y="177.8" text-anchor="middle">0.08</text><text class="tick" x="397.0" y="278" text-anchor="middle">08/05</text><path class="bar" d="M385.0 258.0 V198.5 Q385.0 194.5 389.0 194.5 H405.0 Q409.0 194.5 409.0 198.5 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="397.0" y="188.5" text-anchor="middle">0.07</text><text class="tick" x="473.2" y="278" text-anchor="middle">08/06</text><path class="bar" d="M461.2 258.0 V207.4 Q461.2 203.4 465.2 203.4 H481.2 Q485.2 203.4 485.2 207.4 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="473.2" y="197.4" text-anchor="middle">0.06</text><text class="tick" x="549.4" y="278" text-anchor="middle">08/07</text><path class="bar" d="M537.4 258.0 V198.5 Q537.4 194.5 541.4 194.5 H557.4 Q561.4 194.5 561.4 198.5 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="549.4" y="188.5" text-anchor="middle">0.07</text><text class="tick" x="625.7" y="278" text-anchor="middle">08/10</text><path class="bar" d="M613.7 258.0 V206.1 Q613.7 202.1 617.7 202.1 H633.7 Q637.7 202.1 637.7 206.1 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="625.7" y="196.1" text-anchor="middle">0.06</text><text class="tick" x="701.9" y="278" text-anchor="middle">08/11</text><path class="bar" d="M689.9 258.0 V208.1 Q689.9 204.1 693.9 204.1 H709.9 Q713.9 204.1 713.9 208.1 V258.0 Z" style="fill:var(--hanta)"/><text class="cap-label" x="701.9" y="198.1" text-anchor="middle">0.06</text><rect id="item-rate-glass-hit" x="54" y="22" width="686.0" height="236" fill="transparent"/></svg></div><div class="tooltip" id="item-rate-glass-tip" hidden></div><p class="note chart-hint" hidden>옆으로 밀면 이전 날짜까지 봅니다 · 최근 날짜가 오른쪽 끝입니다</p></div>
+  <p class="note cal-total">전체 기간 진단 886대 · 생성 아이템 57건
     · 대당 평균 0.06개</p>
 </div>
   <div class="day-cal" style="--pick-b: var(--hanta)"
-     data-days='{&quot;days&quot;: {&quot;2026-07-30&quot;: {&quot;cars&quot;: 14, &quot;mean&quot;: 501.85714285714283, &quot;items&quot;: 1, &quot;rate&quot;: 0.07142857142857142, &quot;by&quot;: {&quot;유리 복원&quot;: 0, &quot;유리 교체&quot;: 1}}, &quot;2026-07-31&quot;: {&quot;cars&quot;: 99, &quot;mean&quot;: 154.63636363636363, &quot;items&quot;: 9, &quot;rate&quot;: 0.09090909090909091, &quot;by&quot;: {&quot;유리 복원&quot;: 1, &quot;유리 교체&quot;: 8}}, &quot;2026-08-03&quot;: {&quot;cars&quot;: 104, &quot;mean&quot;: 107.23076923076923, &quot;items&quot;: 3, &quot;rate&quot;: 0.028846153846153848, &quot;by&quot;: {&quot;유리 복원&quot;: 0, &quot;유리 교체&quot;: 3}}, &quot;2026-08-04&quot;: {&quot;cars&quot;: 140, &quot;mean&quot;: 88.75, &quot;items&quot;: 11, &quot;rate&quot;: 0.07857142857142857, &quot;by&quot;: {&quot;유리 복원&quot;: 5, &quot;유리 교체&quot;: 6}}, &quot;2026-08-05&quot;: {&quot;cars&quot;: 119, &quot;mean&quot;: 80.39495798319328, &quot;items&quot;: 8, &quot;rate&quot;: 0.06722689075630252, &quot;by&quot;: {&quot;유리 복원&quot;: 2, &quot;유리 교체&quot;: 6}}, &quot;2026-08-06&quot;: {&quot;cars&quot;: 121, &quot;mean&quot;: 73.6694214876033, &quot;items&quot;: 7, &quot;rate&quot;: 0.05785123966942149, &quot;by&quot;: {&quot;유리 복원&quot;: 2, &quot;유리 교체&quot;: 5}}, &quot;2026-08-07&quot;: {&quot;cars&quot;: 119, &quot;mean&quot;: 66.77310924369748, &quot;items&quot;: 8, &quot;rate&quot;: 0.06722689075630252, &quot;by&quot;: {&quot;유리 복원&quot;: 8, &quot;유리 교체&quot;: 0}}, &quot;2026-08-10&quot;: {&quot;cars&quot;: 135, &quot;mean&quot;: 65.42962962962963, &quot;items&quot;: 8, &quot;rate&quot;: 0.05925925925925926, &quot;by&quot;: {&quot;유리 복원&quot;: 5, &quot;유리 교체&quot;: 3}}, &quot;2026-08-11&quot;: {&quot;cars&quot;: 26, &quot;mean&quot;: 97.07692307692308, &quot;items&quot;: 2, &quot;rate&quot;: 0.07692307692307693, &quot;by&quot;: {&quot;유리 복원&quot;: 1, &quot;유리 교체&quot;: 1}}}, &quot;names&quot;: [&quot;유리 복원&quot;, &quot;유리 교체&quot;]}' data-pick="2026-08-11">
+     data-days='{&quot;days&quot;: {&quot;2026-07-30&quot;: {&quot;cars&quot;: 14, &quot;mean&quot;: 501.85714285714283, &quot;items&quot;: 1, &quot;rate&quot;: 0.07142857142857142, &quot;by&quot;: {&quot;유리 복원&quot;: 0, &quot;유리 교체&quot;: 1}}, &quot;2026-07-31&quot;: {&quot;cars&quot;: 99, &quot;mean&quot;: 154.63636363636363, &quot;items&quot;: 9, &quot;rate&quot;: 0.09090909090909091, &quot;by&quot;: {&quot;유리 복원&quot;: 1, &quot;유리 교체&quot;: 8}}, &quot;2026-08-03&quot;: {&quot;cars&quot;: 104, &quot;mean&quot;: 107.23076923076923, &quot;items&quot;: 3, &quot;rate&quot;: 0.028846153846153848, &quot;by&quot;: {&quot;유리 복원&quot;: 0, &quot;유리 교체&quot;: 3}}, &quot;2026-08-04&quot;: {&quot;cars&quot;: 140, &quot;mean&quot;: 88.75, &quot;items&quot;: 11, &quot;rate&quot;: 0.07857142857142857, &quot;by&quot;: {&quot;유리 복원&quot;: 5, &quot;유리 교체&quot;: 6}}, &quot;2026-08-05&quot;: {&quot;cars&quot;: 119, &quot;mean&quot;: 80.39495798319328, &quot;items&quot;: 8, &quot;rate&quot;: 0.06722689075630252, &quot;by&quot;: {&quot;유리 복원&quot;: 2, &quot;유리 교체&quot;: 6}}, &quot;2026-08-06&quot;: {&quot;cars&quot;: 121, &quot;mean&quot;: 73.6694214876033, &quot;items&quot;: 7, &quot;rate&quot;: 0.05785123966942149, &quot;by&quot;: {&quot;유리 복원&quot;: 2, &quot;유리 교체&quot;: 5}}, &quot;2026-08-07&quot;: {&quot;cars&quot;: 119, &quot;mean&quot;: 66.77310924369748, &quot;items&quot;: 8, &quot;rate&quot;: 0.06722689075630252, &quot;by&quot;: {&quot;유리 복원&quot;: 8, &quot;유리 교체&quot;: 0}}, &quot;2026-08-10&quot;: {&quot;cars&quot;: 135, &quot;mean&quot;: 65.42962962962963, &quot;items&quot;: 8, &quot;rate&quot;: 0.05925925925925926, &quot;by&quot;: {&quot;유리 복원&quot;: 5, &quot;유리 교체&quot;: 3}}, &quot;2026-08-11&quot;: {&quot;cars&quot;: 35, &quot;mean&quot;: 95.2, &quot;items&quot;: 2, &quot;rate&quot;: 0.05714285714285714, &quot;by&quot;: {&quot;유리 복원&quot;: 1, &quot;유리 교체&quot;: 1}}}, &quot;names&quot;: [&quot;유리 복원&quot;, &quot;유리 교체&quot;]}' data-pick="2026-08-11">
   <div class="card">
     <div class="card-head"><h3>일자별 기록</h3></div>
     <div class="calendar">
@@ -18460,7 +18618,7 @@ ul.reason li { font-size: 13px; }
   <div class="cal-grid"><span class="cal-wd">일</span><span class="cal-wd">월</span><span class="cal-wd">화</span><span class="cal-wd">수</span><span class="cal-wd">목</span><span class="cal-wd">금</span><span class="cal-wd">토</span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-day off">1</span><span class="cal-day off">2</span><span class="cal-day off">3</span><span class="cal-day off">4</span><span class="cal-day off">5</span><span class="cal-day off">6</span><span class="cal-day off">7</span><span class="cal-day off">8</span><span class="cal-day off">9</span><span class="cal-day off">10</span><span class="cal-day off">11</span><span class="cal-day off">12</span><span class="cal-day off">13</span><span class="cal-day off">14</span><span class="cal-day off">15</span><span class="cal-day off">16</span><span class="cal-day off">17</span><span class="cal-day off">18</span><span class="cal-day off">19</span><span class="cal-day off">20</span><span class="cal-day off">21</span><span class="cal-day off">22</span><span class="cal-day off">23</span><span class="cal-day off">24</span><span class="cal-day off">25</span><span class="cal-day off">26</span><span class="cal-day off">27</span><span class="cal-day off">28</span><span class="cal-day off">29</span><button type="button" class="cal-day on" data-date="2026-07-30" aria-pressed="false">30<span class="cal-count">14</span></button><button type="button" class="cal-day on" data-date="2026-07-31" aria-pressed="false">31<span class="cal-count">99</span></button></div>
 </div><div class="cal-month">
   <div class="cal-title">2026년 8월</div>
-  <div class="cal-grid"><span class="cal-wd">일</span><span class="cal-wd">월</span><span class="cal-wd">화</span><span class="cal-wd">수</span><span class="cal-wd">목</span><span class="cal-wd">금</span><span class="cal-wd">토</span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-day off">1</span><span class="cal-day off">2</span><button type="button" class="cal-day on" data-date="2026-08-03" aria-pressed="false">3<span class="cal-count">104</span></button><button type="button" class="cal-day on" data-date="2026-08-04" aria-pressed="false">4<span class="cal-count">140</span></button><button type="button" class="cal-day on" data-date="2026-08-05" aria-pressed="false">5<span class="cal-count">119</span></button><button type="button" class="cal-day on" data-date="2026-08-06" aria-pressed="false">6<span class="cal-count">121</span></button><button type="button" class="cal-day on" data-date="2026-08-07" aria-pressed="false">7<span class="cal-count">119</span></button><span class="cal-day off">8</span><span class="cal-day off">9</span><button type="button" class="cal-day on" data-date="2026-08-10" aria-pressed="false">10<span class="cal-count">135</span></button><button type="button" class="cal-day on" data-date="2026-08-11" aria-pressed="false">11<span class="cal-count">26</span></button><span class="cal-day off">12</span><span class="cal-day off">13</span><span class="cal-day off">14</span><span class="cal-day off">15</span><span class="cal-day off">16</span><span class="cal-day off">17</span><span class="cal-day off">18</span><span class="cal-day off">19</span><span class="cal-day off">20</span><span class="cal-day off">21</span><span class="cal-day off">22</span><span class="cal-day off">23</span><span class="cal-day off">24</span><span class="cal-day off">25</span><span class="cal-day off">26</span><span class="cal-day off">27</span><span class="cal-day off">28</span><span class="cal-day off">29</span><span class="cal-day off">30</span><span class="cal-day off">31</span></div>
+  <div class="cal-grid"><span class="cal-wd">일</span><span class="cal-wd">월</span><span class="cal-wd">화</span><span class="cal-wd">수</span><span class="cal-wd">목</span><span class="cal-wd">금</span><span class="cal-wd">토</span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-pad"></span><span class="cal-day off">1</span><span class="cal-day off">2</span><button type="button" class="cal-day on" data-date="2026-08-03" aria-pressed="false">3<span class="cal-count">104</span></button><button type="button" class="cal-day on" data-date="2026-08-04" aria-pressed="false">4<span class="cal-count">140</span></button><button type="button" class="cal-day on" data-date="2026-08-05" aria-pressed="false">5<span class="cal-count">119</span></button><button type="button" class="cal-day on" data-date="2026-08-06" aria-pressed="false">6<span class="cal-count">121</span></button><button type="button" class="cal-day on" data-date="2026-08-07" aria-pressed="false">7<span class="cal-count">119</span></button><span class="cal-day off">8</span><span class="cal-day off">9</span><button type="button" class="cal-day on" data-date="2026-08-10" aria-pressed="false">10<span class="cal-count">135</span></button><button type="button" class="cal-day on" data-date="2026-08-11" aria-pressed="false">11<span class="cal-count">35</span></button><span class="cal-day off">12</span><span class="cal-day off">13</span><span class="cal-day off">14</span><span class="cal-day off">15</span><span class="cal-day off">16</span><span class="cal-day off">17</span><span class="cal-day off">18</span><span class="cal-day off">19</span><span class="cal-day off">20</span><span class="cal-day off">21</span><span class="cal-day off">22</span><span class="cal-day off">23</span><span class="cal-day off">24</span><span class="cal-day off">25</span><span class="cal-day off">26</span><span class="cal-day off">27</span><span class="cal-day off">28</span><span class="cal-day off">29</span><span class="cal-day off">30</span><span class="cal-day off">31</span></div>
 </div>
 </div>
     <div class="tooltip cal-tip" hidden></div>
@@ -29677,12 +29835,12 @@ ul.reason li { font-size: 13px; }
   <summary class="day-head">
     <h3>2026.08.11</h3>
     <div class="day-facts">
-      <span><b>26</b>대</span>
-      <span>평균 <b>1:37</b></span>
+      <span><b>35</b>대</span>
+      <span>평균 <b>1:35</b></span>
       <span>최단 <b>0:57</b> · 최장 <b>3:55</b></span>
       <span>생성 아이템 <b>2</b>건</span>
-      <span class="better">전반 1:43 → 후반 1:31
-        (-12%)</span>
+      <span class="better">전반 1:49 → 후반 1:22
+        (-25%)</span>
     </div>
   </summary>
   <div class="table-scroll"><table class="detail">
@@ -30027,6 +30185,123 @@ ul.reason li { font-size: 13px; }
 </tr>
 <tr class="detail-row"><td colspan="6">
   <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 2건</h4><ul class='notify'><li>[유리] 전면(운전석) 점 찍힘 2개</li><li>[디테일링] 후면 유리 스티커</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">27</td>
+  <td class="mono">12:04</td>
+  <td><strong>55마****</strong><span class="sub">벤츠 SL클래스 (R231) (14년~23년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:32.3%;background:var(--hanta)"></span></span>
+    <span class="val">1:16</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">2</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 2건</h4><ul class='notify'><li>[유리] 전면(운전석) 점 찍힘 2개</li><li>[유리] 전면(조수석) 점 찍힘 2개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">28</td>
+  <td class="mono">12:06</td>
+  <td><strong>10모****</strong><span class="sub">기아 EV9 (23년~현재)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:35.7%;background:var(--hanta)"></span></span>
+    <span class="val">1:24</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">3</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 3건</h4><ul class='notify'><li>[유리] 전면(운전석) 점 찍힘 2개</li><li>[유리] 전면(조수석) 점 찍힘 2개</li><li>[디테일링] 선루프 유리 좁은 오염</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">29</td>
+  <td class="mono">12:08</td>
+  <td><strong>142거****</strong><span class="sub">기아 더 뉴 카니발 하이브리드(KA4) (23년~현재)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:45.5%;background:var(--hanta)"></span></span>
+    <span class="val">1:47</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">3</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 3건</h4><ul class='notify'><li>[유리] 전면(운전석) 점 찍힘 1개</li><li>[유리] 전면(조수석) 점 찍힘 1개</li><li>[유리] 선루프 얕은 긁힘 2개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">30</td>
+  <td class="mono">12:11</td>
+  <td><strong>22주****</strong><span class="sub">쉐보레(GM대우) 더 넥스트 스파크 (15년~18년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:60.4%;background:var(--hanta)"></span></span>
+    <span class="val">2:22</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">6</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 6건</h4><ul class='notify'><li>[유리] 전면(운전석) 얕은 긁힘 1개</li><li>[유리] 전면(운전석) 점 찍힘 2개</li><li>[디테일링] 전면(운전석) 유리 좁은 오염</li><li>[유리] 전면(조수석) 얕은 긁힘 2개</li><li>[유리] 전면(조수석) 점 찍힘 5개</li><li>[유리] 조1열 얕은 긁힘 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">31</td>
+  <td class="mono">12:13</td>
+  <td><strong>841서****</strong><span class="sub">KG모빌리티(쌍용) 더 뉴 렉스턴 스포츠 칸 (21년~현재)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:45.1%;background:var(--hanta)"></span></span>
+    <span class="val">1:46</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">1</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 1건</h4><ul class='notify'><li>[디테일링] 운2열 유리 좁은 오염</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">32</td>
+  <td class="mono">12:15</td>
+  <td><strong>264마****</strong><span class="sub">미니 쿠퍼 3세대(F56) (14년~24년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:37.0%;background:var(--hanta)"></span></span>
+    <span class="val">1:27</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">4</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 4건</h4><ul class='notify'><li>[유리] 전면(운전석) 점 찍힘 2개</li><li>[유리] 전면(조수석) 점 찍힘 2개</li><li>[유리] 운1열 얕은 긁힘 1개</li><li>[유리] 선루프 얕은 긁힘 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">33</td>
+  <td class="mono">12:17</td>
+  <td><strong>08수****</strong><span class="sub">기아 K5 2세대 (15년~18년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:29.8%;background:var(--hanta)"></span></span>
+    <span class="val">1:10</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">4</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 4건</h4><ul class='notify'><li>[유리] 전면(운전석) 얕은 긁힘 1개</li><li>[유리] 전면(운전석) 점 찍힘 1개</li><li>[유리] 전면(조수석) 얕은 긁힘 1개</li><li>[유리] 전면(조수석) 점 찍힘 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">34</td>
+  <td class="mono">12:19</td>
+  <td><strong>55버****</strong><span class="sub">테슬라 모델 Y 주니퍼 (25년~현재)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:30.6%;background:var(--hanta)"></span></span>
+    <span class="val">1:12</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">3</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 3건</h4><ul class='notify'><li>[유리] 전면(운전석) 점 찍힘 2개</li><li>[유리] 전면(조수석) 얕은 긁힘 2개</li><li>[유리] 운1열 얕은 긁힘 1개</li></ul></div></div></details>
+</td></tr><tr>
+  <td class="num">35</td>
+  <td class="mono">14:13</td>
+  <td><strong>381루****</strong><span class="sub">현대 올 뉴 아반떼 (CN7) (20년~23년)</span></td>
+  <td class="elapsed">
+    <span class="bar"><span class="fill" style="width:27.2%;background:var(--hanta)"></span></span>
+    <span class="val">1:04</span>
+  </td>
+  <td><span class="tag none">없음</span></td>
+  <td class="num">5</td>
+</tr>
+<tr class="detail-row"><td colspan="6">
+  <details><summary>판단 내역 보기</summary><div class="detail-body"><div class='block'><h4>고지 항목 5건</h4><ul class='notify'><li>[유리] 전면(운전석) 얕은 긁힘 1개</li><li>[유리] 전면(운전석) 점 찍힘 2개</li><li>[유리] 전면(조수석) 점 찍힘 1개</li><li>[유리] 후면 얕은 긁힘 1개</li><li>[유리] 운2열 얕은 긁힘 1개</li></ul></div></div></details>
 </td></tr></tbody>
 </table></div>
 </details></div>
@@ -30363,6 +30638,19 @@ ul.reason li { font-size: 13px; }
 
 <script>
 // 막대 그래프 — 날짜 위에 커서를 올리면 그 날짜의 두 진단자 값을 함께 보여준다
+// 가로로 긴 차트는 최근 날짜(오른쪽 끝)를 먼저 보여주고, 넘칠 때만 스와이프 안내를 켠다
+const syncCharts = (toEnd) => {
+  document.querySelectorAll('.chart-scroll[data-scroll-end]').forEach((box) => {
+    if (toEnd) box.scrollLeft = box.scrollWidth;
+    const hint = box.parentElement.querySelector('.chart-hint');
+    if (hint) hint.hidden = box.scrollWidth <= box.clientWidth;
+  });
+};
+syncCharts(true);
+// 폰트·세로 스크롤바가 늦게 잡히면 끝까지 못 밀린다 — 로드 완료 뒤 한 번 더 맞춘다
+window.addEventListener('load', () => syncCharts(true));
+window.addEventListener('resize', () => syncCharts(false));
+
 document.querySelectorAll('.chart-wrap').forEach((wrap) => {
   const id = wrap.dataset.chart;
   const data = JSON.parse(wrap.dataset.payload);
